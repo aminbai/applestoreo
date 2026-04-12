@@ -66,10 +66,10 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
   });
 
   const stats = [
-    { label: "মোট প্রোডাক্ট", value: totalProducts, icon: "📦", color: "from-teal-500 to-teal-600" },
-    { label: "আউট অফ স্টক", value: outOfStockProducts, icon: "🚫", color: "from-red-500 to-red-600" },
-    { label: "মোট বিক্রয়", value: `৳${totalSales.toLocaleString('bn-BD')}`, icon: "💰", color: "from-green-500 to-green-600" },
-    { label: "আজকের বিক্রয়", value: todaySales, icon: "📈", color: "from-blue-500 to-blue-600" },
+    { label: "মোট প্রোডাক্ট", value: totalProducts, icon: "📦", color: "from-amber-500 to-orange-600" },
+    { label: "আউট অফ স্টক", value: outOfStockProducts, icon: "🚫", color: "from-rose-500 to-red-600" },
+    { label: "মোট বিক্রয়", value: `৳${totalSales.toLocaleString('bn-BD')}`, icon: "💰", color: "from-emerald-500 to-teal-600" },
+    { label: "আজকের বিক্রয়", value: todaySales, icon: "📈", color: "from-sky-500 to-indigo-600" },
   ];
 
   const isLoading = productsLoading || salesLoading;
@@ -120,7 +120,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
 
   return (
     <div className="flex flex-col h-screen animate-fade-in">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-4">
+       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50 pb-4">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">ড্যাশবোর্ড</h1>
@@ -165,7 +165,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
         </Card>
       )}
 
-      <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200">
+      <Card className="p-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200/60">
         <h2 className="text-xl font-semibold mb-6 text-foreground flex items-center">
           <span className="text-2xl mr-2">💰</span>
           মোট বিনিয়োগ বিশ্লেষণ
@@ -189,12 +189,12 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
             <p className="text-xs text-muted-foreground mt-2">{usedProducts}টি প্রোডাক্ট • {usedProductsStock}টি ইউনিট</p>
           </Card>
           
-          <Card className="p-6 bg-purple-50 dark:bg-purple-950/20 border-purple-200">
+          <Card className="p-6 bg-amber-50 dark:bg-amber-950/20 border-amber-200/60">
             <div className="flex items-center space-x-2 mb-3">
-              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
               <p className="text-sm font-medium text-muted-foreground">সর্বমোট বিনিয়োগ</p>
             </div>
-            <p className="text-3xl font-bold text-purple-600">৳{totalInvestment.toLocaleString('bn-BD')}</p>
+            <p className="text-3xl font-bold text-amber-600">৳{totalInvestment.toLocaleString('bn-BD')}</p>
             <p className="text-xs text-muted-foreground mt-2">{newProducts + usedProducts}টি প্রোডাক্ট • {newProductsStock + usedProductsStock}টি ইউনিট</p>
           </Card>
         </div>
