@@ -27,7 +27,8 @@ import {
   TrendingUp, 
   RefreshCcw, 
   FileText, 
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  LogOut
 } from "lucide-react";
 
 interface IndexProps {
@@ -74,56 +75,52 @@ export default function Index({ user }: IndexProps) {
 
   if (!user) return null;
 
-  // Show loading skeleton while fetching role permissions
   if (roleLoading) {
     return (
-      <div className="min-h-screen bg-white flex">
-        <aside className="hidden lg:block fixed left-0 top-0 h-screen w-64 bg-primary p-6">
-          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-white/20">
-            <Skeleton className="w-20 h-20 rounded-xl bg-white/20" />
+      <div className="min-h-screen bg-background flex">
+        <aside className="hidden lg:block fixed left-0 top-0 h-screen w-72 glass-sidebar p-6">
+          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-sidebar-border">
+            <Skeleton className="w-14 h-14 rounded-2xl bg-sidebar-accent" />
             <div className="space-y-2">
-              <Skeleton className="h-5 w-24 bg-white/20" />
-              <Skeleton className="h-3 w-20 bg-white/20" />
+              <Skeleton className="h-5 w-24 bg-sidebar-accent" />
+              <Skeleton className="h-3 w-20 bg-sidebar-accent" />
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-lg bg-white/20" />
+              <Skeleton key={i} className="h-12 w-full rounded-xl bg-sidebar-accent" />
             ))}
           </div>
         </aside>
-        <main className="lg:pl-64 flex-1 p-8">
+        <main className="lg:pl-72 flex-1 p-8">
           <div className="space-y-6">
             <Skeleton className="h-10 w-48" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-32 rounded-xl" />
+                <Skeleton key={i} className="h-32 rounded-2xl" />
               ))}
             </div>
-            <Skeleton className="h-64 rounded-xl" />
+            <Skeleton className="h-64 rounded-2xl" />
           </div>
         </main>
       </div>
     );
   }
 
-  // Define menu items with permission checks
   const allMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, permission: 'canAccessDashboard' },
-    { id: "products", label: "Products", icon: Package, permission: 'canManageProducts' },
+    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard, permission: 'canAccessDashboard' },
+    { id: "products", label: "পণ্য", icon: Package, permission: 'canManageProducts' },
     { id: "pos", label: "POS", icon: ShoppingCart, permission: 'canAccessPOS' },
-    { id: "sales", label: "Sales", icon: TrendingUp, permission: 'canAccessSales' },
-    { id: "reports", label: "Reports", icon: FileText, permission: 'canAccessReports' },
-    { id: "settings", label: "Settings", icon: SettingsIcon, permission: 'canAccessSettings' },
+    { id: "sales", label: "বিক্রয়", icon: TrendingUp, permission: 'canAccessSales' },
+    { id: "reports", label: "রিপোর্ট", icon: FileText, permission: 'canAccessReports' },
+    { id: "settings", label: "সেটিংস", icon: SettingsIcon, permission: 'canAccessSettings' },
   ];
 
-  // Filter menu items based on permissions
   const menuItems = allMenuItems.filter(item => {
     const permissionKey = item.permission as keyof typeof permissions;
     return permissions[permissionKey];
   });
 
-  // Permission-based tab navigation handler
   const handleTabChange = (tabId: string) => {
     const menuItem = allMenuItems.find(item => item.id === tabId);
     if (menuItem) {
@@ -143,136 +140,145 @@ export default function Index({ user }: IndexProps) {
           onNavigateToPOS={() => handleTabChange("pos")}
           onNavigateToProducts={() => handleTabChange("products")}
         />;
-      case "products":
-        return <Products />;
-      case "categories":
-        return <Categories />;
-      case "pos":
-        return <POS />;
-      case "sales":
-        return <Sales />;
-      case "returns":
-        return <Returns />;
-      case "customers":
-        return <Customers />;
-      case "suppliers":
-        return <Suppliers />;
-      case "reports":
-        return <Reports />;
-      case "settings":
-        return <Settings />;
-      default:
-        return <Dashboard />;
+      case "products": return <Products />;
+      case "categories": return <Categories />;
+      case "pos": return <POS />;
+      case "sales": return <Sales />;
+      case "returns": return <Returns />;
+      case "customers": return <Customers />;
+      case "suppliers": return <Suppliers />;
+      case "reports": return <Reports />;
+      case "settings": return <Settings />;
+      default: return <Dashboard />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-0 h-screen w-64 bg-primary border-r border-border/20 shadow-xl z-40">
-        <div className="flex flex-col h-full p-6">
-          <div className="flex items-center justify-center gap-3 mb-8 pb-6 border-b border-white/20">
-            <img src={logoSrc} alt={settings.shop_name} className="w-16 h-16" />
-            <div>
-              <h1 className="text-lg font-bold text-white leading-tight">{settings.shop_name.split(' ').slice(0, 2).join(' ')}</h1>
-              <p className="text-xs text-white/80">{settings.shop_subtitle}</p>
+    <div className="min-h-screen bg-background">
+      {/* Desktop Sidebar - Apple Velvet Style */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-screen w-72 glass-sidebar border-r border-sidebar-border z-40">
+        <div className="flex flex-col h-full p-5">
+          {/* Logo Section */}
+          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-sidebar-border">
+            <div className="w-14 h-14 rounded-2xl bg-sidebar-accent flex items-center justify-center overflow-hidden shadow-lg">
+              <img src={logoSrc} alt={settings.shop_name} className="w-12 h-12 object-contain" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-base font-bold text-sidebar-foreground leading-tight tracking-tight truncate">
+                {settings.shop_name.split(' ').slice(0, 2).join(' ')}
+              </h1>
+              <p className="text-xs text-sidebar-foreground/50 truncate">{settings.shop_subtitle}</p>
             </div>
           </div>
           
-          <nav className="flex-1 space-y-3 overflow-y-auto">
+          {/* Navigation */}
+          <nav className="flex-1 space-y-1 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon;
+              const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-lg text-left transition-all text-lg ${
-                    activeTab === item.id
-                      ? "bg-white/20 text-white shadow-md"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 text-[15px] ${
+                    isActive
+                      ? "sidebar-active text-sidebar-foreground font-semibold"
+                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                   }`}
                 >
-                  <Icon className="w-7 h-7" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-accent' : ''}`} />
+                  <span className="tracking-tight">{item.label}</span>
                 </button>
               );
             })}
           </nav>
           
-          {/* Logout Button at bottom of sidebar */}
-          <div className="pt-4 border-t border-white/20">
-            <Button
-              variant="destructive"
-              className="w-full flex items-center gap-3 px-5 py-4 text-lg"
+          {/* Logout */}
+          <div className="pt-4 border-t border-sidebar-border">
+            <button
               onClick={async () => {
                 await ActivityLogger.logout();
                 await supabase.auth.signOut({ scope: 'local' });
-                toast.success("Signed out successfully");
+                toast.success("সফলভাবে লগআউট হয়েছে");
                 window.location.href = "/auth";
               }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-all duration-300 text-[15px]"
             >
-              🚪 <span className="font-medium">Logout</span>
-            </Button>
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium tracking-tight">লগআউট</span>
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary/20 shadow-md">
+      {/* Mobile Header - Frosted Glass */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/50">
         <div className="flex items-center justify-between h-16 px-4">
           <div className="flex items-center space-x-3">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center animate-fade-in">
-              <img src={logoSrc} alt={settings.shop_name} className="w-12 h-12 animate-scale-in" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-muted flex items-center justify-center">
+              <img src={logoSrc} alt={settings.shop_name} className="w-8 h-8 object-contain" />
             </div>
             <div>
-              <span className="text-base font-bold text-white block leading-tight">{settings.shop_name.split(' ').slice(0, 2).join(' ')}</span>
-              <span className="text-xs text-white/70">{settings.shop_subtitle}</span>
+              <span className="text-sm font-bold text-foreground block leading-tight tracking-tight">
+                {settings.shop_name.split(' ').slice(0, 3).join(' ')}
+              </span>
+              <span className="text-[10px] text-muted-foreground">{settings.shop_subtitle}</span>
             </div>
           </div>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-white hover:bg-white/10"
+            className="text-foreground hover:bg-muted rounded-xl"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
             </svg>
           </Button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Glass Overlay */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="fixed top-16 left-0 right-0 bg-primary border-b border-primary/20 shadow-lg max-h-[80vh] overflow-y-auto">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`w-full flex items-center space-x-3 px-6 py-4 text-left transition-colors ${
-                    activeTab === item.id
-                      ? "bg-accent text-white font-semibold"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  <Icon className="w-6 h-6" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+        <div className="lg:hidden fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}>
+          <div 
+            className="fixed top-16 left-0 right-0 glass-card border-b border-border/50 shadow-xl max-h-[70vh] overflow-y-auto animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all ${
+                      isActive
+                        ? "bg-accent/10 text-accent font-semibold"
+                        : "text-foreground/70 hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-accent' : ''}`} />
+                    <span className="text-[15px] tracking-tight">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
 
       {/* Main Content */}
-      <main className="lg:pl-64 xl:pl-72">
-        <div className="px-3 py-6 sm:px-4 sm:py-8 lg:px-6 lg:py-8 pt-20 lg:pt-8">
+      <main className="lg:pl-72">
+        <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 pt-20 lg:pt-8">
           {renderContent()}
         </div>
       </main>
@@ -286,30 +292,33 @@ export default function Index({ user }: IndexProps) {
             return;
           }
           setActiveTab("products");
-          // Trigger add product dialog after navigation
           setTimeout(() => {
             window.dispatchEvent(new CustomEvent('open-add-product-dialog'));
           }, 100);
         }}
       />
 
-      {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-primary border-t border-primary/20 shadow-lg z-40">
-        <div className="flex justify-around items-center h-14">
+      {/* Mobile Bottom Navigation - Frosted Glass */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 glass-card border-t border-border/50 z-40">
+        <div className="flex justify-around items-center h-16 px-1">
           {menuItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
+            const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
-                  activeTab === item.id
-                    ? "text-accent bg-accent/10"
-                    : "text-white/70"
+                className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 rounded-xl mx-0.5 ${
+                  isActive
+                    ? "text-accent"
+                    : "text-muted-foreground"
                 }`}
               >
-                <Icon className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px]">{item.label}</span>
+                <Icon className={`w-5 h-5 mb-1 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
+                <span className="text-[10px] font-medium tracking-tight">{item.label}</span>
+                {isActive && (
+                  <div className="w-1 h-1 rounded-full bg-accent mt-0.5" />
+                )}
               </button>
             );
           })}
