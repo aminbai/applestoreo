@@ -28,6 +28,8 @@ export function POS() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [instantCustomerName, setInstantCustomerName] = useState("");
   const [instantCustomerPhone, setInstantCustomerPhone] = useState("");
+  const [paidAmount, setPaidAmount] = useState(0);
+  const [instantCustomerPhone, setInstantCustomerPhone] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -64,6 +66,8 @@ export function POS() {
           status: "completed",
           instant_customer_name: saleData.instant_customer_name,
           instant_customer_phone: saleData.instant_customer_phone,
+          paid_amount: saleData.paid_amount,
+          due_amount: saleData.due_amount,
         }])
         .select("*, customers(*)")
         .single();
@@ -131,6 +135,7 @@ export function POS() {
       setPaymentMethod("cash");
       setInstantCustomerName("");
       setInstantCustomerPhone("");
+      setPaidAmount(0);
     },
     onError: (error: any) => {
       toast.error(error.message || "বিক্রয় সম্পন্ন করতে ব্যর্থ");
@@ -203,12 +208,16 @@ export function POS() {
       return;
     }
 
+    const dueAmount = Math.max(0, getTotal() - paidAmount);
+
     const saleData = {
       customer_id: selectedCustomer || null,
       total_amount: getTotal(),
       payment_method: paymentMethod,
       instant_customer_name: instantCustomerName || null,
       instant_customer_phone: instantCustomerPhone || null,
+      paid_amount: paidAmount,
+      due_amount: dueAmount,
       items: cart.map(item => ({
         product_id: item.product.id,
         quantity: item.quantity,
