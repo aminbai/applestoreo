@@ -103,6 +103,20 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
   const totalDueAmount = dueSales?.reduce((s, sale) => s + Number(sale.due_amount), 0) || 0;
   const totalDueCount = dueSales?.length || 0;
 
+  // Top debtors calculation
+  const topDebtors = (() => {
+    const map: Record<string, { name: string; phone: string; totalDue: number; count: number }> = {};
+    dueSales?.forEach(sale => {
+      const key = sale.customer_id || sale.instant_customer_name || 'unknown';
+      const name = (sale as any).customers?.name || sale.instant_customer_name || 'অজানা';
+      const phone = (sale as any).customers?.phone || '';
+      if (!map[key]) map[key] = { name, phone, totalDue: 0, count: 0 };
+      map[key].totalDue += Number(sale.due_amount);
+      map[key].count += 1;
+    });
+    return Object.values(map).sort((a, b) => b.totalDue - a.totalDue).slice(0, 5);
+  })();
+
   const stats = [
     { label: "মোট প্রোডাক্ট", value: totalProducts, icon: "📦", color: "from-amber-500 to-orange-600" },
     { label: "আউট অফ স্টক", value: outOfStockProducts, icon: "🚫", color: "from-rose-500 to-red-600" },
