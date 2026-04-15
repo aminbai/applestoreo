@@ -235,7 +235,49 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
         </div>
       </Card>
 
-      {outOfStockProducts > 0 && (
+      {/* Customer Due / Top Debtors Widget */}
+      {topDebtors.length > 0 && (
+        <Card className="p-6 bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/20 dark:to-orange-950/20 border-rose-200/60">
+          <h2 className="text-xl font-semibold mb-4 text-foreground flex items-center">
+            <CreditCard className="w-6 h-6 mr-2 text-rose-600" />
+            শীর্ষ বাকিদার কাস্টমার
+          </h2>
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <Card className="p-3 bg-rose-50 dark:bg-rose-950/20 border-rose-200 text-center">
+              <p className="text-xs text-muted-foreground">মোট বাকি</p>
+              <p className="text-xl font-bold text-rose-600">৳{totalDueAmount.toLocaleString('bn-BD')}</p>
+            </Card>
+            <Card className="p-3 bg-orange-50 dark:bg-orange-950/20 border-orange-200 text-center">
+              <p className="text-xs text-muted-foreground">বাকি বিক্রয়</p>
+              <p className="text-xl font-bold text-orange-600">{totalDueCount}টি</p>
+            </Card>
+            <Card className="p-3 bg-amber-50 dark:bg-amber-950/20 border-amber-200 text-center">
+              <p className="text-xs text-muted-foreground">বাকিদার সংখ্যা</p>
+              <p className="text-xl font-bold text-amber-600">{topDebtors.length}জন</p>
+            </Card>
+          </div>
+          <div className="space-y-2">
+            {topDebtors.map((debtor, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-rose-100 dark:border-rose-900/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-sm font-bold text-rose-600">
+                    {idx + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{debtor.name}</p>
+                    {debtor.phone && <p className="text-[10px] text-muted-foreground">📞 {debtor.phone}</p>}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-rose-600">৳{debtor.totalDue.toLocaleString('bn-BD')}</p>
+                  <Badge variant="outline" className="text-[9px] border-rose-300 text-rose-600">{debtor.count}টি বিক্রয়</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
         <Card className="p-6 border-red-200 bg-red-50 dark:bg-red-950/20">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">🚫</span>
