@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, TrendingUp, TrendingDown, Wallet, PiggyBank, ArrowDownCircle, ArrowUpCircle, Trash2, Building2, Pencil } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, Wallet, PiggyBank, ArrowDownCircle, ArrowUpCircle, Trash2, Building2, Pencil, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { bn } from "date-fns/locale";
+import { useShopSettings } from "@/hooks/useShopSettings";
 
 export function Investments() {
   const queryClient = useQueryClient();
