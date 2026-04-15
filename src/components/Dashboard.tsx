@@ -55,7 +55,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
   const { data: dueSales } = useQuery({
     queryKey: ["due-sales-summary"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("sales").select("id, total_amount, paid_amount, due_amount").gt("due_amount", 0);
+      const { data, error } = await supabase.from("sales").select("id, total_amount, paid_amount, due_amount, customer_id, instant_customer_name, customers(name, phone)").gt("due_amount", 0);
       if (error) throw error;
       return data;
     },
