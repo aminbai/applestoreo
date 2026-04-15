@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useShopSettings } from "@/hooks/useShopSettings";
 import { MobileDashboardWidget } from "./MobileDashboardWidget";
-import { Wallet, TrendingUp, AlertCircle, PiggyBank } from "lucide-react";
+import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface DashboardProps {
   onNavigateToPOS?: () => void;
@@ -54,7 +55,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
   const { data: dueSales } = useQuery({
     queryKey: ["due-sales-summary"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("sales").select("id, total_amount, paid_amount, due_amount").gt("due_amount", 0);
+      const { data, error } = await supabase.from("sales").select("id, total_amount, paid_amount, due_amount, customer_id, instant_customer_name, customers(name, phone)").gt("due_amount", 0);
       if (error) throw error;
       return data;
     },
@@ -101,6 +102,20 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
   const totalIncomeAmount = investmentIncomes?.reduce((s, i) => s + Number(i.amount), 0) || 0;
   const totalDueAmount = dueSales?.reduce((s, sale) => s + Number(sale.due_amount), 0) || 0;
   const totalDueCount = dueSales?.length || 0;
+
+  // Top debtors calculation
+  const topDebtors = (() => {
+    const map: Record<string, { name: string; phone: string; totalDue: number; count: number }> = {};
+    dueSales?.forEach(sale => {
+      const key = sale.customer_id || sale.instant_customer_name || 'unknown';
+      const name = (sale as any).customers?.name || sale.instant_customer_name || 'অজানা';
+      const phone = (sale as any).customers?.phone || '';
+      if (!map[key]) map[key] = { name, phone, totalDue: 0, count: 0 };
+      map[key].totalDue += Number(sale.due_amount);
+      map[key].count += 1;
+    });
+    return Object.values(map).sort((a, b) => b.totalDue - a.totalDue).slice(0, 5);
+  })();
 
   const stats = [
     { label: "মোট প্রোডাক্ট", value: totalProducts, icon: "📦", color: "from-amber-500 to-orange-600" },
@@ -219,6 +234,49 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
           </Card>
         </div>
       </Card>
+
+      {/* Customer Due / Top Debtors Widget */}
+      {topDebtors.length > 0 && (
+        <Card className="p-6 bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/20 dark:to-orange-950/20 border-rose-200/60">
+          <h2 className="text-xl font-semibold mb-4 text-foreground flex items-center">
+            <CreditCard className="w-6 h-6 mr-2 text-rose-600" />
+            শীর্ষ বাকিদার কাস্টমার
+          </h2>
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <Card className="p-3 bg-rose-50 dark:bg-rose-950/20 border-rose-200 text-center">
+              <p className="text-xs text-muted-foreground">মোট বাকি</p>
+              <p className="text-xl font-bold text-rose-600">৳{totalDueAmount.toLocaleString('bn-BD')}</p>
+            </Card>
+            <Card className="p-3 bg-orange-50 dark:bg-orange-950/20 border-orange-200 text-center">
+              <p className="text-xs text-muted-foreground">বাকি বিক্রয়</p>
+              <p className="text-xl font-bold text-orange-600">{totalDueCount}টি</p>
+            </Card>
+            <Card className="p-3 bg-amber-50 dark:bg-amber-950/20 border-amber-200 text-center">
+              <p className="text-xs text-muted-foreground">বাকিদার সংখ্যা</p>
+              <p className="text-xl font-bold text-amber-600">{topDebtors.length}জন</p>
+            </Card>
+          </div>
+          <div className="space-y-2">
+            {topDebtors.map((debtor, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-rose-100 dark:border-rose-900/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-sm font-bold text-rose-600">
+                    {idx + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{debtor.name}</p>
+                    {debtor.phone && <p className="text-[10px] text-muted-foreground">📞 {debtor.phone}</p>}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-rose-600">৳{debtor.totalDue.toLocaleString('bn-BD')}</p>
+                  <Badge variant="outline" className="text-[9px] border-rose-300 text-rose-600">{debtor.count}টি বিক্রয়</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {outOfStockProducts > 0 && (
         <Card className="p-6 border-red-200 bg-red-50 dark:bg-red-950/20">
