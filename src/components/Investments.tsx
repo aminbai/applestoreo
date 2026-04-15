@@ -16,6 +16,7 @@ import { useShopSettings } from "@/hooks/useShopSettings";
 
 export function Investments() {
   const queryClient = useQueryClient();
+  const { settings } = useShopSettings();
   const [showAddSector, setShowAddSector] = useState(false);
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [showAddIncome, setShowAddIncome] = useState(false);
