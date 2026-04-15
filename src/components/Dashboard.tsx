@@ -94,6 +94,14 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
     });
   });
 
+  // Investment & Due stats
+  const totalInvDeposit = investmentEntries?.filter(e => e.entry_type === 'deposit').reduce((s, e) => s + Number(e.amount), 0) || 0;
+  const totalInvWithdraw = investmentEntries?.filter(e => e.entry_type === 'withdraw').reduce((s, e) => s + Number(e.amount), 0) || 0;
+  const netInvestmentAmount = totalInvDeposit - totalInvWithdraw;
+  const totalIncomeAmount = investmentIncomes?.reduce((s, i) => s + Number(i.amount), 0) || 0;
+  const totalDueAmount = dueSales?.reduce((s, sale) => s + Number(sale.due_amount), 0) || 0;
+  const totalDueCount = dueSales?.length || 0;
+
   const stats = [
     { label: "মোট প্রোডাক্ট", value: totalProducts, icon: "📦", color: "from-amber-500 to-orange-600" },
     { label: "আউট অফ স্টক", value: outOfStockProducts, icon: "🚫", color: "from-rose-500 to-red-600" },
@@ -179,6 +187,38 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
           </Card>
         ))}
         </div>
+
+      {/* Investment & Due Summary Widget */}
+      <Card className="p-6 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/20 dark:to-purple-950/20 border-violet-200/60">
+        <h2 className="text-xl font-semibold mb-4 text-foreground flex items-center">
+          <Wallet className="w-6 h-6 mr-2 text-violet-600" />
+          ইনভেস্টমেন্ট ও বাকি আদায় সামারি
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card className="p-4 bg-violet-50 dark:bg-violet-950/20 border-violet-200">
+            <div className="flex items-center gap-2 mb-2">
+              <PiggyBank className="w-4 h-4 text-violet-600" />
+              <p className="text-sm text-muted-foreground">নেট বিনিয়োগ</p>
+            </div>
+            <p className="text-2xl font-bold text-violet-600">৳{netInvestmentAmount.toLocaleString('bn-BD')}</p>
+          </Card>
+          <Card className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-4 h-4 text-emerald-600" />
+              <p className="text-sm text-muted-foreground">মোট আয়</p>
+            </div>
+            <p className="text-2xl font-bold text-emerald-600">৳{totalIncomeAmount.toLocaleString('bn-BD')}</p>
+          </Card>
+          <Card className="p-4 bg-rose-50 dark:bg-rose-950/20 border-rose-200">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="w-4 h-4 text-rose-600" />
+              <p className="text-sm text-muted-foreground">বাকি আদায় বাকি</p>
+            </div>
+            <p className="text-2xl font-bold text-rose-600">৳{totalDueAmount.toLocaleString('bn-BD')}</p>
+            <p className="text-xs text-muted-foreground mt-1">{totalDueCount}টি বিক্রয়ে বাকি আছে</p>
+          </Card>
+        </div>
+      </Card>
 
       {outOfStockProducts > 0 && (
         <Card className="p-6 border-red-200 bg-red-50 dark:bg-red-950/20">
