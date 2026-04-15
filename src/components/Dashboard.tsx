@@ -32,6 +32,34 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
     },
   });
 
+  // Investment data
+  const { data: investmentEntries } = useQuery({
+    queryKey: ["investment-entries"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("investment_entries").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: investmentIncomes } = useQuery({
+    queryKey: ["investment-incomes"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("investment_incomes").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: dueSales } = useQuery({
+    queryKey: ["due-sales-summary"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("sales").select("id, total_amount, paid_amount, due_amount").gt("due_amount", 0);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const totalProducts = products?.length || 0;
   const outOfStockProducts = products?.filter(p => p.stock_quantity <= 0).length || 0;
   const totalSales = sales?.reduce((sum, sale) => sum + Number(sale.total_amount), 0) || 0;
