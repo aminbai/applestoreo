@@ -184,9 +184,9 @@ export default function Index({ user }: IndexProps) {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 text-[15px] ${
+                  className={`w-full flex items-center gap-3 rounded-xl text-left transition-all duration-300 font-semibold py-[20px] px-[16px] text-xl opacity-100 ${
                     isActive
-                      ? "sidebar-active text-sidebar-foreground font-semibold"
+                      ? "sidebar-active text-sidebar-foreground"
                       : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                   }`}
                 >
