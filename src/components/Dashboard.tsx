@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useShopSettings } from "@/hooks/useShopSettings";
 import { MobileDashboardWidget } from "./MobileDashboardWidget";
-import { Wallet, TrendingUp, AlertCircle, PiggyBank } from "lucide-react";
+import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface DashboardProps {
   onNavigateToPOS?: () => void;
