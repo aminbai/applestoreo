@@ -290,6 +290,74 @@ export function Investments() {
     </div>
   );
 
+  const handlePrintReport = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) { toast.error("পপআপ ব্লক হয়েছে"); return; }
+
+    const sectorRows = sectorStats.map(s => `
+      <tr>
+        <td style="padding:8px;border:1px solid #ddd;">${s.name}</td>
+        <td style="padding:8px;border:1px solid #ddd;text-align:right;">৳${s.totalDeposit.toLocaleString()}</td>
+        <td style="padding:8px;border:1px solid #ddd;text-align:right;">৳${s.totalWithdraw.toLocaleString()}</td>
+        <td style="padding:8px;border:1px solid #ddd;text-align:right;font-weight:bold;">৳${s.netInvestment.toLocaleString()}</td>
+        <td style="padding:8px;border:1px solid #ddd;text-align:right;">৳${s.totalIncome.toLocaleString()}</td>
+        <td style="padding:8px;border:1px solid #ddd;text-align:right;font-weight:bold;color:${s.totalIncome - s.netInvestment >= 0 ? 'green' : 'red'}">৳${(s.totalIncome - s.netInvestment).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    const entryRows = (filteredEntries || []).map(e => `
+      <tr>
+        <td style="padding:6px;border:1px solid #ddd;">${format(new Date(e.entry_date), 'dd MMM yyyy', { locale: bn })}</td>
+        <td style="padding:6px;border:1px solid #ddd;">${(e as any).investment_sectors?.name || ''}</td>
+        <td style="padding:6px;border:1px solid #ddd;">${e.entry_type === 'deposit' ? 'জমা' : 'উত্তোলন'}</td>
+        <td style="padding:6px;border:1px solid #ddd;">${e.purpose || ''}</td>
+        <td style="padding:6px;border:1px solid #ddd;text-align:right;">৳${Number(e.amount).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    const incomeRows = (filteredIncomes || []).map(i => `
+      <tr>
+        <td style="padding:6px;border:1px solid #ddd;">${format(new Date(i.income_date), 'dd MMM yyyy', { locale: bn })}</td>
+        <td style="padding:6px;border:1px solid #ddd;">${(i as any).investment_sectors?.name || ''}</td>
+        <td style="padding:6px;border:1px solid #ddd;">${i.source || ''}</td>
+        <td style="padding:6px;border:1px solid #ddd;">${i.purpose || ''}</td>
+        <td style="padding:6px;border:1px solid #ddd;text-align:right;">৳${Number(i.amount).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    printWindow.document.write(`
+      <html><head><title>ইনভেস্টমেন্ট রিপোর্ট - ${settings.shop_name}</title>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; color: #333; }
+        h1 { text-align: center; margin-bottom: 4px; }
+        h3 { text-align: center; color: #666; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th { background: #1a1a2e; color: white; padding: 10px 8px; text-align: left; }
+        .summary { display: flex; gap: 20px; margin: 20px 0; }
+        .summary-card { flex: 1; padding: 16px; border-radius: 8px; text-align: center; }
+        @media print { body { padding: 0; } }
+      </style></head><body>
+      <h1>${settings.shop_name}</h1>
+      <h3>ইনভেস্টমেন্ট রিপোর্ট — ${format(new Date(), 'dd MMMM yyyy', { locale: bn })}</h3>
+      <hr/>
+      <div class="summary">
+        <div class="summary-card" style="background:#f0e6ff;"><strong>নেট বিনিয়োগ</strong><br/><span style="font-size:24px;font-weight:bold;color:#7c3aed;">৳${grandTotalInvestment.toLocaleString()}</span></div>
+        <div class="summary-card" style="background:#e6fff0;"><strong>মোট আয়</strong><br/><span style="font-size:24px;font-weight:bold;color:#059669;">৳${grandTotalIncome.toLocaleString()}</span></div>
+        <div class="summary-card" style="background:${grandTotalIncome - grandTotalInvestment >= 0 ? '#e6fff0' : '#ffe6e6'};"><strong>লাভ/ক্ষতি</strong><br/><span style="font-size:24px;font-weight:bold;color:${grandTotalIncome - grandTotalInvestment >= 0 ? '#059669' : '#dc2626'};">৳${(grandTotalIncome - grandTotalInvestment).toLocaleString()}</span></div>
+      </div>
+      <h2>খাতওয়ারি সারসংক্ষেপ</h2>
+      <table><thead><tr><th>খাত</th><th>জমা</th><th>উত্তোলন</th><th>নেট বিনিয়োগ</th><th>আয়</th><th>লাভ/ক্ষতি</th></tr></thead><tbody>${sectorRows}</tbody></table>
+      <h2>ইনভেস্টমেন্ট এন্ট্রি</h2>
+      <table><thead><tr><th>তারিখ</th><th>খাত</th><th>ধরণ</th><th>উদ্দেশ্য</th><th>পরিমাণ</th></tr></thead><tbody>${entryRows || '<tr><td colspan="5" style="text-align:center;padding:20px;">কোনো এন্ট্রি নেই</td></tr>'}</tbody></table>
+      <h2>আয়ের তালিকা</h2>
+      <table><thead><tr><th>তারিখ</th><th>খাত</th><th>উৎস</th><th>উদ্দেশ্য</th><th>পরিমাণ</th></tr></thead><tbody>${incomeRows || '<tr><td colspan="5" style="text-align:center;padding:20px;">কোনো আয় নেই</td></tr>'}</tbody></table>
+      <p style="text-align:center;color:#999;margin-top:30px;">রিপোর্ট তৈরি: ${new Date().toLocaleString('bn-BD')} | ${settings.shop_name}</p>
+      </body></html>
+    `);
+    printWindow.document.close();
+    setTimeout(() => printWindow.print(), 500);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -298,6 +366,9 @@ export function Investments() {
           <p className="text-sm text-muted-foreground">খাতওয়ারি বিনিয়োগ ও আয় হিসাব</p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" size="sm" onClick={handlePrintReport}>
+            <Printer className="w-4 h-4 mr-1" /> PDF রিপোর্ট
+          </Button>
           <Dialog open={showAddSector} onOpenChange={setShowAddSector}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm"><Building2 className="w-4 h-4 mr-1" /> নতুন খাত</Button>
