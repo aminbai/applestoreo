@@ -278,6 +278,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
         </Card>
       )}
 
+      {outOfStockProducts > 0 && (
         <Card className="p-6 border-red-200 bg-red-50 dark:bg-red-950/20">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">🚫</span>
