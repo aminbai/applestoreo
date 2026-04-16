@@ -313,6 +313,8 @@ export function POS() {
                 onInstantCustomerPhoneChange={setInstantCustomerPhone}
                 paidAmount={paidAmount}
                 onPaidAmountChange={setPaidAmount}
+                saleImageUrl={saleImageUrl}
+                onSaleImageUrlChange={setSaleImageUrl}
               />
             </div>
           </div>
