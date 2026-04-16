@@ -31,7 +31,8 @@ import {
   FileText, 
   Settings as SettingsIcon,
   LogOut,
-  Wallet
+  Wallet,
+  UserCheck
 } from "lucide-react";
 
 interface IndexProps {
