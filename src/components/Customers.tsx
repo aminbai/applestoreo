@@ -251,17 +251,42 @@ export function Customers() {
           </Card>
         </div>
 
-        {/* Search & Filter */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="নাম, ফোন, ইমেইল খুঁজুন..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9 text-sm" />
-          </div>
-          <select value={filterDue} onChange={e => setFilterDue(e.target.value)} className="h-9 px-3 rounded-md border border-input bg-background text-sm">
-            <option value="all">সকল</option>
-            <option value="due">বাকিদার</option>
-            <option value="clear">বাকি নেই</option>
-          </select>
+        {/* Search, Filter & Sort - Collapsible */}
+        <div>
+          <button onClick={() => setShowFilters(!showFilters)} className="w-full flex items-center justify-between mb-2">
+            <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Filter className="w-4 h-4 text-primary" />
+              ফিল্টার ও সার্চ
+            </span>
+            <div className="p-1 rounded-md bg-muted/50 hover:bg-muted transition-colors">
+              {showFilters ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+            </div>
+          </button>
+          {showFilters && (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input placeholder="নাম, ফোন, ইমেইল খুঁজুন..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9 text-sm" />
+              </div>
+              <select value={filterDue} onChange={e => setFilterDue(e.target.value)} className="h-9 px-3 rounded-md border border-input bg-background text-sm">
+                <option value="all">সকল</option>
+                <option value="due">বাকিদার</option>
+                <option value="clear">বাকি নেই</option>
+              </select>
+              <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+                <SelectTrigger className="h-9 w-32 text-xs">
+                  <ArrowUpDown className="w-3 h-3 mr-1" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">নাম (A-Z)</SelectItem>
+                  <SelectItem value="due_high">বেশি বাকি</SelectItem>
+                  <SelectItem value="purchases">বেশি ক্রয়</SelectItem>
+                  <SelectItem value="newest">সর্বশেষ যুক্ত</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </div>
 
