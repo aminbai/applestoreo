@@ -12,7 +12,7 @@ import { ProductHistory } from "./ProductHistory";
 import { ProductDetailModal } from "./ProductDetailModal";
 import { BarcodeScanner } from "./BarcodeScanner";
 import { ProductQuickView } from "./ProductQuickView";
-import { Eye, ScanBarcode, Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Eye, ScanBarcode, Download, FileSpreadsheet, FileText, ChevronDown, ChevronUp, ArrowUpDown, Filter } from "lucide-react";
 import { ActivityLogger } from "@/hooks/useActivityLog";
 import * as XLSX from "xlsx";
 export function Products() {
@@ -26,6 +26,8 @@ export function Products() {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [showScanner, setShowScanner] = useState(false);
   const [showOutOfStock, setShowOutOfStock] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
+  const [sortBy, setSortBy] = useState<"name" | "price_high" | "price_low" | "newest" | "oldest">("name");
   const [formData, setFormData] = useState({
     name: "",
     category_id: "",
@@ -258,7 +260,7 @@ export function Products() {
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     
-    return products.filter((product) => {
+    let result = products.filter((product) => {
       const matchesSearch = 
         searchTerm === "" ||
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -278,7 +280,20 @@ export function Products() {
 
       return matchesSearch && matchesCondition && matchesCategory && hasStock;
     });
-  }, [products, searchTerm, filterCondition, filterCategory, showOutOfStock]);
+
+    // Sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case "price_high": return Number(b.price) - Number(a.price);
+        case "price_low": return Number(a.price) - Number(b.price);
+        case "newest": return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case "oldest": return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        default: return a.name.localeCompare(b.name);
+      }
+    });
+
+    return result;
+  }, [products, searchTerm, filterCondition, filterCategory, showOutOfStock, sortBy]);
 
   const handleBarcodeScanned = (barcode: string) => {
     // Search for product by barcode or IMEI
@@ -745,75 +760,94 @@ export function Products() {
         </div>
 
       {/* Search and Filters */}
-      <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2 flex gap-2">
-            <Input
-              placeholder="Search by name, IMEI, brand, or SKU..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1"
-            />
-            <Button 
-              variant="outline" 
-              onClick={() => setShowScanner(true)}
-              className="shrink-0"
-            >
-              <ScanBarcode className="w-4 h-4" />
-            </Button>
+      <Card className="p-3 lg:p-4">
+        {/* Collapsible filter header */}
+        <button onClick={() => setShowFilters(!showFilters)} className="w-full flex items-center justify-between mb-2">
+          <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Filter className="w-4 h-4 text-primary" />
+            Filters & Search
+          </span>
+          <div className="p-1 rounded-md bg-muted/50 hover:bg-muted transition-colors">
+            {showFilters ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
           </div>
-          <Select value={filterCondition} onValueChange={setFilterCondition}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by condition" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Conditions</SelectItem>
-              <SelectItem value="new">New</SelectItem>
-              <SelectItem value="used">Used</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories?.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="mt-4 flex items-center space-x-2">
-          <Checkbox 
-            id="showOutOfStock" 
-            checked={showOutOfStock}
-            onCheckedChange={(checked) => setShowOutOfStock(checked as boolean)}
-          />
-          <label
-            htmlFor="showOutOfStock"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-          >
-            Show out of stock products (0 stock)
-          </label>
-        </div>
-        {(searchTerm || filterCondition !== "all" || filterCategory !== "all") && (
-          <div className="mt-3 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Found {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
-            </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearchTerm("");
-                setFilterCondition("all");
-                setFilterCategory("all");
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
+        </button>
+
+        {showFilters && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+              <div className="md:col-span-2 flex gap-2">
+                <Input
+                  placeholder="Search by name, IMEI, brand, or SKU..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1 h-9 text-sm"
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowScanner(true)}
+                  className="shrink-0 h-9"
+                >
+                  <ScanBarcode className="w-4 h-4" />
+                </Button>
+              </div>
+              <Select value={filterCondition} onValueChange={setFilterCondition}>
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Conditions</SelectItem>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="used">Used</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories?.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+                <SelectTrigger className="h-9 text-sm">
+                  <ArrowUpDown className="w-3 h-3 mr-1" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Name A-Z</SelectItem>
+                  <SelectItem value="price_high">Price: High</SelectItem>
+                  <SelectItem value="price_low">Price: Low</SelectItem>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="showOutOfStock" 
+                  checked={showOutOfStock}
+                  onCheckedChange={(checked) => setShowOutOfStock(checked as boolean)}
+                />
+                <label htmlFor="showOutOfStock" className="text-xs lg:text-sm font-medium cursor-pointer">
+                  Show out of stock (0 stock)
+                </label>
+              </div>
+              {(searchTerm || filterCondition !== "all" || filterCategory !== "all") && (
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    {filteredProducts.length} found
+                  </p>
+                  <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setSearchTerm(""); setFilterCondition("all"); setFilterCategory("all"); }}>
+                    Clear
+                  </Button>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </Card>
       </div>
