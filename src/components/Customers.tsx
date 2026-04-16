@@ -160,8 +160,19 @@ export function Customers() {
     } else if (filterDue === "clear") {
       filtered = filtered.filter(c => !customerDueMap[c.id]?.totalDue);
     }
+
+    // Sort
+    filtered = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "due_high": return (customerDueMap[b.id]?.totalDue || 0) - (customerDueMap[a.id]?.totalDue || 0);
+        case "purchases": return (customerDueMap[b.id]?.totalPurchases || 0) - (customerDueMap[a.id]?.totalPurchases || 0);
+        case "newest": return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        default: return a.name.localeCompare(b.name);
+      }
+    });
+
     return filtered;
-  }, [customers, searchTerm, filterDue, customerDueMap]);
+  }, [customers, searchTerm, filterDue, customerDueMap, sortBy]);
 
   return (
     <div className="flex flex-col h-screen animate-fade-in">
