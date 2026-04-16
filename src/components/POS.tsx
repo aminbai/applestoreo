@@ -68,6 +68,7 @@ export function POS() {
           instant_customer_phone: saleData.instant_customer_phone,
           paid_amount: saleData.paid_amount,
           due_amount: saleData.due_amount,
+          image_url: saleData.image_url || null,
         }])
         .select("*, customers(*)")
         .single();
