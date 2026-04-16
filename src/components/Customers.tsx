@@ -19,6 +19,8 @@ export function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDue, setFilterDue] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"name" | "due_high" | "purchases" | "newest">("name");
+  const [showFilters, setShowFilters] = useState(true);
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", address: "", notes: "",
   });
