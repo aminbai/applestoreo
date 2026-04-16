@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { bn } from "date-fns/locale";
 import { Search, Users, Wallet, AlertTriangle, Eye, Pencil, Trash2, Plus } from "lucide-react";
 import { DueCollection } from "./DueCollection";
+import { CustomerPDFReport } from "./CustomerPDFReport";
 
 export function Customers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -349,6 +350,7 @@ export function Customers() {
                     <Button variant="outline" size="sm" className="flex-1 h-7 text-xs" onClick={() => setSelectedCustomer(customer)}>
                       <Eye className="w-3 h-3 mr-1" /> বিস্তারিত
                     </Button>
+                    <CustomerPDFReport customer={customer} dueMap={customerDueMap} allSales={allSales || []} />
                     <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => startEdit(customer)}>
                       <Pencil className="w-3 h-3" />
                     </Button>
