@@ -116,6 +116,7 @@ export default function Index({ user }: IndexProps) {
     { id: "products", label: "Products", icon: Package, permission: 'canManageProducts' },
     { id: "pos", label: "POS", icon: ShoppingCart, permission: 'canAccessPOS' },
     { id: "sales", label: "Sales", icon: TrendingUp, permission: 'canAccessSales' },
+    { id: "customer-details", label: "Customer Ledger", icon: UserCheck, permission: 'canManageCustomers' },
     { id: "investments", label: "Investments", icon: Wallet, permission: 'canAccessReports' },
     { id: "reports", label: "Reports", icon: FileText, permission: 'canAccessReports' },
     { id: "settings", label: "Settings", icon: SettingsIcon, permission: 'canAccessSettings' },
