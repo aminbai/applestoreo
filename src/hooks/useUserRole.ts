@@ -19,53 +19,45 @@ export interface RolePermissions {
   canResetData: boolean;
 }
 
-const rolePermissions: Record<AppRole, RolePermissions> = {
+// Fallback permissions if DB fetch fails
+const fallbackPermissions: Record<AppRole, RolePermissions> = {
   admin: {
-    canAccessSettings: true,
-    canAccessReports: true,
-    canAccessUserManagement: true,
-    canManageProducts: true,
-    canManageCustomers: true,
-    canManageSuppliers: true,
-    canManageCategories: true,
-    canAccessPOS: true,
-    canAccessSales: true,
-    canAccessReturns: true,
-    canAccessDashboard: true,
-    canBackupRestore: true,
-    canResetData: true,
+    canAccessSettings: true, canAccessReports: true, canAccessUserManagement: true,
+    canManageProducts: true, canManageCustomers: true, canManageSuppliers: true,
+    canManageCategories: true, canAccessPOS: true, canAccessSales: true,
+    canAccessReturns: true, canAccessDashboard: true, canBackupRestore: true, canResetData: true,
   },
   manager: {
-    canAccessSettings: false,
-    canAccessReports: false,
-    canAccessUserManagement: false,
-    canManageProducts: true,
-    canManageCustomers: false,
-    canManageSuppliers: false,
-    canManageCategories: false,
-    canAccessPOS: false,
-    canAccessSales: true,
-    canAccessReturns: false,
-    canAccessDashboard: true,
-    canBackupRestore: true,
-    canResetData: false,
+    canAccessSettings: false, canAccessReports: false, canAccessUserManagement: false,
+    canManageProducts: true, canManageCustomers: false, canManageSuppliers: false,
+    canManageCategories: false, canAccessPOS: false, canAccessSales: true,
+    canAccessReturns: false, canAccessDashboard: true, canBackupRestore: true, canResetData: false,
   },
   staff: {
-    canAccessSettings: false,
-    canAccessReports: false,
-    canAccessUserManagement: false,
-    canManageProducts: false,
-    canManageCustomers: false,
-    canManageSuppliers: false,
-    canManageCategories: false,
-    canAccessPOS: false,
-    canAccessSales: true,
-    canAccessReturns: false,
-    canAccessDashboard: true,
-    canBackupRestore: false,
-    canResetData: false,
+    canAccessSettings: false, canAccessReports: false, canAccessUserManagement: false,
+    canManageProducts: false, canManageCustomers: false, canManageSuppliers: false,
+    canManageCategories: false, canAccessPOS: false, canAccessSales: true,
+    canAccessReturns: false, canAccessDashboard: true, canBackupRestore: false, canResetData: false,
   },
 };
+
+function dbRowToPermissions(row: any): RolePermissions {
+  return {
+    canAccessDashboard: row.can_access_dashboard,
+    canAccessPOS: row.can_access_pos,
+    canAccessSales: row.can_access_sales,
+    canAccessReports: row.can_access_reports,
+    canAccessSettings: row.can_access_settings,
+    canManageProducts: row.can_manage_products,
+    canManageCustomers: row.can_manage_customers,
+    canManageSuppliers: row.can_manage_suppliers,
+    canManageCategories: row.can_manage_categories,
+    canAccessReturns: row.can_access_returns,
+    canAccessUserManagement: row.can_access_user_management,
+    canBackupRestore: row.can_backup_restore,
+    canResetData: row.can_reset_data,
+  };
+}
 
 export function useUserRole() {
   const [role, setRole] = useState<AppRole | null>(null);
@@ -73,7 +65,7 @@ export function useUserRole() {
   const [isManager, setIsManager] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [permissions, setPermissions] = useState<RolePermissions>(rolePermissions.staff);
+  const [permissions, setPermissions] = useState<RolePermissions>(fallbackPermissions.staff);
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -94,16 +86,34 @@ export function useUserRole() {
 
         if (error) {
           console.error('Error fetching role:', error);
-        } else if (data) {
-          const userRole = data.role as AppRole;
-          setRole(userRole);
-          setIsAdmin(userRole === 'admin');
-          setIsManager(userRole === 'manager' || userRole === 'admin');
-          setPermissions(rolePermissions[userRole] || rolePermissions.staff);
+        }
+
+        const userRole = (data?.role as AppRole) || 'staff';
+        setRole(userRole);
+        setIsAdmin(userRole === 'admin');
+        setIsManager(userRole === 'manager' || userRole === 'admin');
+
+        // Fetch permissions from DB
+        const { data: permData, error: permError } = await supabase
+          .from('role_permissions')
+          .select('*')
+          .eq('role', userRole)
+          .maybeSingle();
+
+        if (permError || !permData) {
+          // Admin always gets full access regardless
+          if (userRole === 'admin') {
+            setPermissions(fallbackPermissions.admin);
+          } else {
+            setPermissions(fallbackPermissions[userRole] || fallbackPermissions.staff);
+          }
         } else {
-          // Default to staff if no role found
-          setRole('staff');
-          setPermissions(rolePermissions.staff);
+          // Admin always gets full access
+          if (userRole === 'admin') {
+            setPermissions(fallbackPermissions.admin);
+          } else {
+            setPermissions(dbRowToPermissions(permData));
+          }
         }
       } catch (error) {
         console.error('Error in useUserRole:', error);
@@ -123,4 +133,3 @@ export function useUserRole() {
 
   return { role, isAdmin, isManager, loading, userId, permissions };
 }
-

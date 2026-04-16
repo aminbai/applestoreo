@@ -550,6 +550,66 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          can_access_dashboard: boolean
+          can_access_pos: boolean
+          can_access_reports: boolean
+          can_access_returns: boolean
+          can_access_sales: boolean
+          can_access_settings: boolean
+          can_access_user_management: boolean
+          can_backup_restore: boolean
+          can_manage_categories: boolean
+          can_manage_customers: boolean
+          can_manage_products: boolean
+          can_manage_suppliers: boolean
+          can_reset_data: boolean
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          can_access_dashboard?: boolean
+          can_access_pos?: boolean
+          can_access_reports?: boolean
+          can_access_returns?: boolean
+          can_access_sales?: boolean
+          can_access_settings?: boolean
+          can_access_user_management?: boolean
+          can_backup_restore?: boolean
+          can_manage_categories?: boolean
+          can_manage_customers?: boolean
+          can_manage_products?: boolean
+          can_manage_suppliers?: boolean
+          can_reset_data?: boolean
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          can_access_dashboard?: boolean
+          can_access_pos?: boolean
+          can_access_reports?: boolean
+          can_access_returns?: boolean
+          can_access_sales?: boolean
+          can_access_settings?: boolean
+          can_access_user_management?: boolean
+          can_backup_restore?: boolean
+          can_manage_categories?: boolean
+          can_manage_customers?: boolean
+          can_manage_products?: boolean
+          can_manage_suppliers?: boolean
+          can_reset_data?: boolean
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sale_items: {
         Row: {
           condition: string | null
