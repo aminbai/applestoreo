@@ -284,7 +284,7 @@ export function Sales() {
               className="flex items-center gap-2 text-left"
             >
               <Filter className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-              <CardTitle className="text-base md:text-lg">Filters & Search</CardTitle>
+              <CardTitle className="text-base md:text-lg">ফিল্টার ও সার্চ</CardTitle>
               <span className="text-sm text-muted-foreground ml-2">
                 {showFilters ? "▼" : "▶"}
               </span>
