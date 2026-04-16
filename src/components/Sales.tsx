@@ -621,43 +621,46 @@ export function Sales() {
                 </Card>
               )}
 
-              {/* Products */}
               <Card>
                 <CardHeader className="p-3 md:p-6">
                   <CardTitle className="text-base md:text-lg flex items-center gap-2">
                     <Package className="h-4 w-4 md:h-5 md:w-5" />
-                    Products Sold
+                    বিক্রিত পণ্য
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 md:p-6 pt-0">
                   <div className="space-y-3 md:space-y-4">
                     {(selectedSale.sale_items || []).map((item, index) => (
                       <div key={index}>
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
-                          <div className="flex-1 space-y-1">
-                            <div className="text-sm md:text-base font-semibold">{item.products.name}</div>
-                            <div className="text-xs md:text-sm text-muted-foreground space-y-0.5">
-                              {item.products.brand && (
-                                <div>Brand: {item.products.brand}</div>
-                              )}
-                              {item.products.model && (
-                                <div>Model: {item.products.model}</div>
-                              )}
-                              {item.products.imei && (
-                                <div className="break-all">IMEI: {item.products.imei}</div>
-                              )}
-                              {item.products.sku && (
-                                <div className="break-all">SKU: {item.products.sku}</div>
-                              )}
-                              <div>Condition: <Badge variant="outline" className="capitalize text-xs">{item.condition}</Badge></div>
+                        <div className="flex gap-3">
+                          {/* Product Image */}
+                          {item.products.image_url && (
+                            <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border border-border bg-muted">
+                              <img
+                                src={getOptimizedUrl(item.products.image_url, { width: 120, height: 120 })}
+                                alt={item.products.name}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                          </div>
-                          <div className="text-right space-y-1 border-t sm:border-0 pt-2 sm:pt-0">
-                            <div className="text-xs md:text-sm text-muted-foreground">
-                              {item.quantity} × ৳{Number(item.unit_price).toLocaleString()}
+                          )}
+                          <div className="flex-1 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
+                            <div className="flex-1 space-y-1">
+                              <div className="text-sm md:text-base font-semibold">{item.products.name}</div>
+                              <div className="text-xs md:text-sm text-muted-foreground space-y-0.5">
+                                {item.products.brand && <div>ব্র্যান্ড: {item.products.brand}</div>}
+                                {item.products.model && <div>মডেল: {item.products.model}</div>}
+                                {item.products.imei && <div className="break-all">IMEI: {item.products.imei}</div>}
+                                {item.products.sku && <div className="break-all">SKU: {item.products.sku}</div>}
+                                <div>অবস্থা: <Badge variant="outline" className="capitalize text-xs">{item.condition === "new" ? "নতুন" : item.condition === "used" ? "ব্যবহৃত" : item.condition}</Badge></div>
+                              </div>
                             </div>
-                            <div className="text-sm md:text-base font-semibold text-accent">
-                              ৳{Number(item.total_price).toLocaleString()}
+                            <div className="text-right space-y-1 border-t sm:border-0 pt-2 sm:pt-0">
+                              <div className="text-xs md:text-sm text-muted-foreground">
+                                {item.quantity} × ৳{Number(item.unit_price).toLocaleString()}
+                              </div>
+                              <div className="text-sm md:text-base font-semibold text-accent">
+                                ৳{Number(item.total_price).toLocaleString()}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -672,31 +675,31 @@ export function Sales() {
 
                   {/* Total */}
                   <div className="flex justify-between items-center">
-                    <span className="text-base md:text-lg font-semibold">Total Amount:</span>
+                    <span className="text-base md:text-lg font-semibold">মোট:</span>
                     <span className="text-xl md:text-2xl font-bold text-accent">
                       ৳{Number(selectedSale.total_amount).toLocaleString()}
                     </span>
                   </div>
-                  {Number((selectedSale as any).paid_amount) > 0 && (
+                  {Number(selectedSale.paid_amount) > 0 && (
                     <div className="flex justify-between items-center mt-1">
-                      <span className="text-sm text-muted-foreground">Paid:</span>
-                      <span className="text-sm">৳{Number((selectedSale as any).paid_amount).toLocaleString()}</span>
+                      <span className="text-sm text-muted-foreground">প্রদত্ত:</span>
+                      <span className="text-sm">৳{Number(selectedSale.paid_amount).toLocaleString()}</span>
                     </div>
                   )}
-                  {Number((selectedSale as any).due_amount) > 0 && (
+                  {Number(selectedSale.due_amount) > 0 && (
                     <div className="flex justify-between items-center mt-1">
-                      <span className="text-sm font-semibold text-destructive">Due:</span>
-                      <span className="text-sm font-bold text-destructive">৳{Number((selectedSale as any).due_amount).toLocaleString()}</span>
+                      <span className="text-sm font-semibold text-destructive">বাকি:</span>
+                      <span className="text-sm font-bold text-destructive">৳{Number(selectedSale.due_amount).toLocaleString()}</span>
                     </div>
                   )}
                 </CardContent>
               </Card>
 
               {/* Due Collection */}
-              {Number((selectedSale as any).due_amount) > 0 && (
+              {Number(selectedSale.due_amount) > 0 && (
                 <DueCollection
                   saleId={selectedSale.id}
-                  currentDue={Number((selectedSale as any).due_amount)}
+                  currentDue={Number(selectedSale.due_amount)}
                 />
               )}
 
@@ -704,7 +707,7 @@ export function Sales() {
               {selectedSale.notes && (
                 <Card>
                   <CardHeader className="p-3 md:p-6">
-                    <CardTitle className="text-base md:text-lg">Notes</CardTitle>
+                    <CardTitle className="text-base md:text-lg">নোট</CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 md:p-6 pt-0">
                     <p className="text-xs md:text-sm text-muted-foreground">{selectedSale.notes}</p>
