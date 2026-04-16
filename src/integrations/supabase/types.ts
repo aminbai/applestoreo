@@ -604,6 +604,7 @@ export type Database = {
           customer_id: string | null
           due_amount: number
           id: string
+          image_url: string | null
           instant_customer_name: string | null
           instant_customer_phone: string | null
           notes: string | null
@@ -619,6 +620,7 @@ export type Database = {
           customer_id?: string | null
           due_amount?: number
           id?: string
+          image_url?: string | null
           instant_customer_name?: string | null
           instant_customer_phone?: string | null
           notes?: string | null
@@ -634,6 +636,7 @@ export type Database = {
           customer_id?: string | null
           due_amount?: number
           id?: string
+          image_url?: string | null
           instant_customer_name?: string | null
           instant_customer_phone?: string | null
           notes?: string | null
