@@ -13,6 +13,7 @@ import { bn } from "date-fns/locale";
 import { Search, Users, Wallet, AlertTriangle, Eye, Pencil, Trash2, Plus, ChevronDown, ChevronUp, ArrowUpDown, Filter } from "lucide-react";
 import { DueCollection } from "./DueCollection";
 import { CustomerPDFReport } from "./CustomerPDFReport";
+import { CloudinaryUpload } from "./CloudinaryUpload";
 
 export function Customers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -23,7 +24,7 @@ export function Customers() {
   const [sortBy, setSortBy] = useState<"name" | "due_high" | "purchases" | "newest">("name");
   const [showFilters, setShowFilters] = useState(true);
   const [formData, setFormData] = useState({
-    name: "", email: "", phone: "", address: "", notes: "",
+    name: "", email: "", phone: "", address: "", notes: "", image_url: "",
   });
 
   const queryClient = useQueryClient();
@@ -105,7 +106,7 @@ export function Customers() {
     onError: (error: any) => toast.error(error.message || "মুছতে ব্যর্থ"),
   });
 
-  const resetForm = () => setFormData({ name: "", email: "", phone: "", address: "", notes: "" });
+  const resetForm = () => setFormData({ name: "", email: "", phone: "", address: "", notes: "", image_url: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,6 +122,7 @@ export function Customers() {
     setFormData({
       name: customer.name || "", email: customer.email || "",
       phone: customer.phone || "", address: customer.address || "", notes: customer.notes || "",
+      image_url: customer.image_url || "",
     });
   };
 
@@ -216,6 +218,12 @@ export function Customers() {
                   <label className="block text-sm font-medium mb-1">নোটস</label>
                   <Input value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
                 </div>
+                <CloudinaryUpload
+                  currentImageUrl={formData.image_url}
+                  onUpload={(url) => setFormData({ ...formData, image_url: url })}
+                  folder="apple-store/customers"
+                  label="📸 কাস্টমারের ছবি"
+                />
                 <div className="flex gap-2 justify-end">
                   <Button type="button" variant="outline" onClick={() => { setIsAddDialogOpen(false); setEditingCustomer(null); resetForm(); }}>
                     বাতিল

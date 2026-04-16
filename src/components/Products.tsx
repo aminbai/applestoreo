@@ -149,6 +149,7 @@ export function Products() {
       supplier_nid: "",
       warranty_expiry_date: "",
       warranty_status: "no_warranty",
+      image_url: "",
     });
   };
 
