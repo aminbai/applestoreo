@@ -260,7 +260,7 @@ export function Products() {
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     
-    return products.filter((product) => {
+    let result = products.filter((product) => {
       const matchesSearch = 
         searchTerm === "" ||
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -280,7 +280,20 @@ export function Products() {
 
       return matchesSearch && matchesCondition && matchesCategory && hasStock;
     });
-  }, [products, searchTerm, filterCondition, filterCategory, showOutOfStock]);
+
+    // Sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case "price_high": return Number(b.price) - Number(a.price);
+        case "price_low": return Number(a.price) - Number(b.price);
+        case "newest": return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case "oldest": return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        default: return a.name.localeCompare(b.name);
+      }
+    });
+
+    return result;
+  }, [products, searchTerm, filterCondition, filterCategory, showOutOfStock, sortBy]);
 
   const handleBarcodeScanned = (barcode: string) => {
     // Search for product by barcode or IMEI
