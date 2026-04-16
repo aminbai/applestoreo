@@ -158,6 +158,16 @@ export function PaymentSection({
         )}
       </div>
 
+      {/* Sale Image (Optional) */}
+      <div className="pt-2">
+        <CloudinaryUpload
+          currentImageUrl={saleImageUrl}
+          onUpload={onSaleImageUrlChange}
+          folder="apple-store/sales"
+          label="📸 বিক্রয়ের ছবি (ঐচ্ছিক)"
+        />
+      </div>
+
       <div className="bg-primary/10 p-3 lg:p-4 rounded-lg">
         <div className="flex justify-between items-center">
           <span className="text-base lg:text-lg font-semibold text-foreground">সর্বমোট:</span>
