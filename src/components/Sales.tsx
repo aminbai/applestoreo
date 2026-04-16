@@ -593,19 +593,19 @@ export function Sales() {
                   <CardHeader className="p-3 md:p-6">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2">
                       <User className="h-4 w-4 md:h-5 md:w-5" />
-                      Customer Information
+                      ক্রেতার তথ্য
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 p-3 md:p-6 pt-0">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                      <span className="text-xs md:text-sm text-muted-foreground">Name:</span>
+                      <span className="text-xs md:text-sm text-muted-foreground">নাম:</span>
                       <span className="text-sm md:text-base font-semibold">
                         {selectedSale.customers?.name || selectedSale.instant_customer_name}
                       </span>
                     </div>
                     {(selectedSale.customers?.phone || selectedSale.instant_customer_phone) && (
                       <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                        <span className="text-xs md:text-sm text-muted-foreground">Phone:</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">ফোন:</span>
                         <span className="text-sm md:text-base">
                           {selectedSale.customers?.phone || selectedSale.instant_customer_phone}
                         </span>
@@ -613,7 +613,7 @@ export function Sales() {
                     )}
                     {selectedSale.customers?.email && (
                       <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                        <span className="text-xs md:text-sm text-muted-foreground">Email:</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">ইমেইল:</span>
                         <span className="text-sm md:text-base">{selectedSale.customers.email}</span>
                       </div>
                     )}
