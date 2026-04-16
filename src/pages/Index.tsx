@@ -5,6 +5,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { Products } from "@/components/Products";
 import { POS } from "@/components/POS";
 import { Customers } from "@/components/Customers";
+import { CustomerDetails } from "@/components/CustomerDetails";
 import { Suppliers } from "@/components/Suppliers";
 import { Reports } from "@/components/Reports";
 import { Settings } from "@/components/Settings";
@@ -30,7 +31,8 @@ import {
   FileText, 
   Settings as SettingsIcon,
   LogOut,
-  Wallet
+  Wallet,
+  UserCheck
 } from "lucide-react";
 
 interface IndexProps {
@@ -114,6 +116,7 @@ export default function Index({ user }: IndexProps) {
     { id: "products", label: "Products", icon: Package, permission: 'canManageProducts' },
     { id: "pos", label: "POS", icon: ShoppingCart, permission: 'canAccessPOS' },
     { id: "sales", label: "Sales", icon: TrendingUp, permission: 'canAccessSales' },
+    { id: "customer-details", label: "Customer Ledger", icon: UserCheck, permission: 'canManageCustomers' },
     { id: "investments", label: "Investments", icon: Wallet, permission: 'canAccessReports' },
     { id: "reports", label: "Reports", icon: FileText, permission: 'canAccessReports' },
     { id: "settings", label: "Settings", icon: SettingsIcon, permission: 'canAccessSettings' },
@@ -150,6 +153,7 @@ export default function Index({ user }: IndexProps) {
       case "returns": return <Returns />;
       case "investments": return <Investments />;
       case "customers": return <Customers />;
+      case "customer-details": return <CustomerDetails />;
       case "suppliers": return <Suppliers />;
       case "reports": return <Reports />;
       case "settings": return <Settings />;
