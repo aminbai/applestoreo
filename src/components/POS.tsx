@@ -29,6 +29,7 @@ export function POS() {
   const [instantCustomerName, setInstantCustomerName] = useState("");
   const [instantCustomerPhone, setInstantCustomerPhone] = useState("");
   const [paidAmount, setPaidAmount] = useState(0);
+  const [saleImageUrl, setSaleImageUrl] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -67,6 +68,7 @@ export function POS() {
           instant_customer_phone: saleData.instant_customer_phone,
           paid_amount: saleData.paid_amount,
           due_amount: saleData.due_amount,
+          image_url: saleData.image_url || null,
         }])
         .select("*, customers(*)")
         .single();
@@ -135,6 +137,7 @@ export function POS() {
       setInstantCustomerName("");
       setInstantCustomerPhone("");
       setPaidAmount(0);
+      setSaleImageUrl("");
     },
     onError: (error: any) => {
       toast.error(error.message || "বিক্রয় সম্পন্ন করতে ব্যর্থ");
@@ -217,6 +220,7 @@ export function POS() {
       instant_customer_phone: instantCustomerPhone || null,
       paid_amount: paidAmount,
       due_amount: dueAmount,
+      image_url: saleImageUrl || null,
       items: cart.map(item => ({
         product_id: item.product.id,
         quantity: item.quantity,
@@ -312,6 +316,8 @@ export function POS() {
                 onInstantCustomerPhoneChange={setInstantCustomerPhone}
                 paidAmount={paidAmount}
                 onPaidAmountChange={setPaidAmount}
+                saleImageUrl={saleImageUrl}
+                onSaleImageUrlChange={setSaleImageUrl}
               />
             </div>
           </div>

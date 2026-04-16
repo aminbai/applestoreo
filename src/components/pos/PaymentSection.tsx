@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CloudinaryUpload } from "@/components/CloudinaryUpload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Customer } from "./types";
 
@@ -20,6 +21,8 @@ interface PaymentSectionProps {
   onInstantCustomerPhoneChange: (phone: string) => void;
   paidAmount: number;
   onPaidAmountChange: (amount: number) => void;
+  saleImageUrl: string;
+  onSaleImageUrlChange: (url: string) => void;
 }
 
 export function PaymentSection({
@@ -38,6 +41,8 @@ export function PaymentSection({
   onInstantCustomerPhoneChange,
   paidAmount,
   onPaidAmountChange,
+  saleImageUrl,
+  onSaleImageUrlChange,
 }: PaymentSectionProps) {
   const [useInstantCustomer, setUseInstantCustomer] = useState(false);
 
@@ -151,6 +156,16 @@ export function PaymentSection({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Sale Image (Optional) */}
+      <div className="pt-2">
+        <CloudinaryUpload
+          currentImageUrl={saleImageUrl}
+          onUpload={onSaleImageUrlChange}
+          folder="apple-store/sales"
+          label="📸 বিক্রয়ের ছবি (ঐচ্ছিক)"
+        />
       </div>
 
       <div className="bg-primary/10 p-3 lg:p-4 rounded-lg">

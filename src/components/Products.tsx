@@ -48,6 +48,7 @@ export function Products() {
     supplier_name: "",
     supplier_mobile: "",
     supplier_nid: "",
+    supplier_image_url: "",
     warranty_expiry_date: "",
     warranty_status: "no_warranty",
     image_url: "",
@@ -147,6 +148,7 @@ export function Products() {
       supplier_name: "",
       supplier_mobile: "",
       supplier_nid: "",
+      supplier_image_url: "",
       warranty_expiry_date: "",
       warranty_status: "no_warranty",
       image_url: "",
@@ -257,6 +259,7 @@ export function Products() {
       supplier_name: product.supplier_name || "",
       supplier_mobile: product.supplier_mobile || "",
       supplier_nid: product.supplier_nid || "",
+      supplier_image_url: "",
       warranty_expiry_date: product.warranty_expiry_date || "",
       warranty_status: product.warranty_status || "no_warranty",
       image_url: product.image_url || "",
@@ -709,6 +712,14 @@ export function Products() {
                       value={formData.supplier_nid}
                       onChange={(e) => setFormData({ ...formData, supplier_nid: e.target.value })}
                       placeholder="Enter NID number"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <CloudinaryUpload
+                      currentImageUrl={formData.supplier_image_url}
+                      onUpload={(url) => setFormData({ ...formData, supplier_image_url: url })}
+                      folder="apple-store/suppliers"
+                      label="📸 সাপ্লায়ারের ছবি (ঐচ্ছিক)"
                     />
                   </div>
                 </div>
