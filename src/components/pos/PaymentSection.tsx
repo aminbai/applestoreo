@@ -21,6 +21,8 @@ interface PaymentSectionProps {
   onInstantCustomerPhoneChange: (phone: string) => void;
   paidAmount: number;
   onPaidAmountChange: (amount: number) => void;
+  saleImageUrl: string;
+  onSaleImageUrlChange: (url: string) => void;
 }
 
 export function PaymentSection({
