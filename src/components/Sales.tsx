@@ -530,35 +530,57 @@ export function Sales() {
 
           {selectedSale && (
             <div className="space-y-4 md:space-y-6">
+              {/* Sale Image */}
+              {selectedSale.image_url && (
+                <Card>
+                  <CardHeader className="p-3 md:p-6 pb-2">
+                    <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                      <ImageIcon className="h-4 w-4 md:h-5 md:w-5" />
+                      বিক্রয়ের ছবি
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-3 md:p-6 pt-0">
+                    <div className="w-full max-w-xs rounded-lg overflow-hidden border border-border">
+                      <img
+                        src={getOptimizedUrl(selectedSale.image_url, { width: 400 })}
+                        alt="বিক্রয়ের ছবি"
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Sale Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Sale ID</CardDescription>
-                    <CardTitle className="text-sm md:text-base font-mono break-all">#{selectedSale.id}</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">সেল আইডি</CardDescription>
+                    <CardTitle className="text-sm md:text-base font-mono break-all">#{selectedSale.id.slice(0, 8)}</CardTitle>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Date & Time</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">তারিখ ও সময়</CardDescription>
                     <CardTitle className="text-sm md:text-base">
-                      <span className="hidden sm:inline">{format(new Date(selectedSale.created_at), "dd MMM yyyy, hh:mm a")}</span>
-                      <span className="sm:hidden">{format(new Date(selectedSale.created_at), "dd MMM yyyy")}</span>
+                      {format(new Date(selectedSale.created_at), "dd MMM yyyy, hh:mm a")}
                     </CardTitle>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Payment Method</CardDescription>
-                    <CardTitle className="text-sm md:text-base capitalize">{selectedSale.payment_method}</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">পেমেন্ট পদ্ধতি</CardDescription>
+                    <CardTitle className="text-sm md:text-base capitalize">
+                      {selectedSale.payment_method === "cash" ? "নগদ" : selectedSale.payment_method === "card" ? "কার্ড" : selectedSale.payment_method === "mobile" ? "মোবাইল" : selectedSale.payment_method}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Status</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">স্ট্যাটাস</CardDescription>
                     <CardTitle className="text-sm md:text-base">
                       <Badge variant={selectedSale.status === "completed" ? "default" : "secondary"} className="text-xs">
-                        {selectedSale.status}
+                        {selectedSale.status === "completed" ? "সম্পন্ন" : selectedSale.status}
                       </Badge>
                     </CardTitle>
                   </CardHeader>
