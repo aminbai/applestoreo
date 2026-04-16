@@ -26,6 +26,8 @@ export function Products() {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [showScanner, setShowScanner] = useState(false);
   const [showOutOfStock, setShowOutOfStock] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
+  const [sortBy, setSortBy] = useState<"name" | "price_high" | "price_low" | "newest" | "oldest">("name");
   const [formData, setFormData] = useState({
     name: "",
     category_id: "",
