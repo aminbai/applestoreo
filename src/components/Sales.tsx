@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { Search, Calendar, User, CreditCard, Package, Filter, X, FileDown, FileSpreadsheet } from "lucide-react";
+import { Search, Calendar, User, CreditCard, Package, Filter, X, FileDown, FileSpreadsheet, ImageIcon } from "lucide-react";
+import { getOptimizedUrl, isCloudinaryUrl } from "@/lib/cloudinary";
 import { useReactToPrint } from "react-to-print";
 import * as XLSX from "xlsx";
 import { DueCollection } from "./DueCollection";
@@ -24,6 +25,9 @@ interface SaleDetail {
   customer_id: string | null;
   instant_customer_name: string | null;
   instant_customer_phone: string | null;
+  paid_amount: number;
+  due_amount: number;
+  image_url: string | null;
   customers: {
     name: string;
     phone: string | null;
@@ -40,6 +44,7 @@ interface SaleDetail {
       imei: string | null;
       brand: string | null;
       model: string | null;
+      image_url: string | null;
     };
   }>;
 }
@@ -70,7 +75,7 @@ export function Sales() {
             unit_price,
             total_price,
             condition,
-            products (name, sku, imei, brand, model)
+            products (name, sku, imei, brand, model, image_url)
           )
         `)
         .order("created_at", { ascending: false });
@@ -221,8 +226,8 @@ export function Sales() {
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-4 space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Sales History</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">View and manage all sales transactions</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">বিক্রয় ইতিহাস</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">সকল বিক্রয় লেনদেন দেখুন ও পরিচালনা করুন</p>
           </div>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -252,19 +257,19 @@ export function Sales() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
         <Card className="card-hover">
           <CardHeader className="pb-3 p-4 md:p-6">
-            <CardDescription className="text-xs md:text-sm">Total Sales</CardDescription>
+            <CardDescription className="text-xs md:text-sm">মোট বিক্রয়</CardDescription>
             <CardTitle className="text-2xl md:text-3xl text-primary">{totalSales}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="card-hover hidden lg:block">
           <CardHeader className="pb-3 p-4 md:p-6">
-            <CardDescription className="text-xs md:text-sm">Total Revenue</CardDescription>
+            <CardDescription className="text-xs md:text-sm">মোট আয়</CardDescription>
             <CardTitle className="text-2xl md:text-3xl text-accent">৳{totalRevenue.toLocaleString()}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="card-hover hidden lg:block">
           <CardHeader className="pb-3 p-4 md:p-6">
-            <CardDescription className="text-xs md:text-sm">Average Sale</CardDescription>
+            <CardDescription className="text-xs md:text-sm">গড় বিক্রয়</CardDescription>
             <CardTitle className="text-2xl md:text-3xl text-secondary">৳{averageSale.toFixed(0)}</CardTitle>
           </CardHeader>
         </Card>
@@ -279,7 +284,7 @@ export function Sales() {
               className="flex items-center gap-2 text-left"
             >
               <Filter className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-              <CardTitle className="text-base md:text-lg">Filters & Search</CardTitle>
+              <CardTitle className="text-base md:text-lg">ফিল্টার ও সার্চ</CardTitle>
               <span className="text-sm text-muted-foreground ml-2">
                 {showFilters ? "▼" : "▶"}
               </span>
@@ -306,7 +311,7 @@ export function Sales() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by ID, customer, product..."
+                  placeholder="আইডি, কাস্টমার, পণ্য দিয়ে সার্চ..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 text-sm md:text-base"
@@ -343,7 +348,7 @@ export function Sales() {
                   <SelectValue placeholder="All Customers" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
+                  <SelectItem value="all">সকল কাস্টমার</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
@@ -360,11 +365,11 @@ export function Sales() {
                   <SelectValue placeholder="All Payment Methods" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Methods</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="card">Card</SelectItem>
-                  <SelectItem value="mobile">Mobile Banking</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="all">সকল পদ্ধতি</SelectItem>
+                  <SelectItem value="cash">নগদ</SelectItem>
+                  <SelectItem value="card">কার্ড</SelectItem>
+                  <SelectItem value="mobile">মোবাইল ব্যাংকিং</SelectItem>
+                  <SelectItem value="other">অন্যান্য</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -380,17 +385,17 @@ export function Sales() {
         <Card>
         <CardHeader className="p-4 md:p-6">
           <CardTitle className="text-base md:text-lg">
-            Sales List ({filteredSales.length} {filteredSales.length === 1 ? "sale" : "sales"})
+            বিক্রয় তালিকা ({filteredSales.length} টি)
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 md:p-6 pt-0">
           {paginatedSales.length === 0 ? (
             <div className="text-center py-8 md:py-12 text-muted-foreground">
               <Package className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 opacity-50" />
-              <p className="text-sm md:text-base">No sales found</p>
+              <p className="text-sm md:text-base">কোনো বিক্রয় পাওয়া যায়নি</p>
               {hasActiveFilters && (
                 <Button variant="link" onClick={clearFilters} className="mt-2 text-sm md:text-base">
-                  Clear filters to see all sales
+                  সকল বিক্রয় দেখতে ফিল্টার মুছুন
                 </Button>
               )}
             </div>
@@ -402,18 +407,42 @@ export function Sales() {
                   onClick={() => setSelectedSale(sale)}
                   className="border border-border rounded-lg p-3 md:p-4 hover:border-primary hover:bg-accent/5 cursor-pointer transition-all card-hover"
                 >
-                  <div className="flex flex-col gap-3">
-                    <div className="flex-1 space-y-2">
+                  <div className="flex gap-3">
+                    {/* Sale Image Thumbnail */}
+                    {sale.image_url && (
+                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-lg overflow-hidden border border-border bg-muted">
+                        <img
+                          src={getOptimizedUrl(sale.image_url, { width: 100, height: 100 })}
+                          alt="বিক্রয়ের ছবি"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    {/* Product thumbnail if no sale image */}
+                    {!sale.image_url && (sale.sale_items || [])[0]?.products?.image_url && (
+                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-lg overflow-hidden border border-border bg-muted">
+                        <img
+                          src={getOptimizedUrl((sale.sale_items || [])[0].products.image_url!, { width: 100, height: 100 })}
+                          alt="পণ্যের ছবি"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex-1 flex flex-col gap-2">
                       <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                         <span className="font-mono text-xs md:text-sm font-semibold text-primary">
                           #{sale.id.slice(0, 8)}
                         </span>
                         <Badge variant={sale.status === "completed" ? "default" : "secondary"} className="text-xs">
-                          {sale.status}
+                          {sale.status === "completed" ? "সম্পন্ন" : sale.status}
                         </Badge>
                         <Badge variant="outline" className="capitalize text-xs">
-                          {sale.payment_method}
+                          {sale.payment_method === "cash" ? "নগদ" : sale.payment_method === "card" ? "কার্ড" : sale.payment_method === "mobile" ? "মোবাইল" : sale.payment_method}
                         </Badge>
+                        {sale.image_url && (
+                          <ImageIcon className="h-3 w-3 text-muted-foreground" />
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground flex-wrap">
@@ -430,18 +459,23 @@ export function Sales() {
                         )}
                         <div className="flex items-center gap-1">
                           <Package className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                          {(sale.sale_items || []).length} {(sale.sale_items || []).length === 1 ? "item" : "items"}
+                          {(sale.sale_items || []).length} টি পণ্য
                         </div>
+                      </div>
+
+                      {/* Product names preview */}
+                      <div className="text-xs text-muted-foreground truncate">
+                        {(sale.sale_items || []).map(i => i.products?.name).filter(Boolean).join(", ")}
                       </div>
                     </div>
 
-                    <div className="text-right border-t border-border pt-2 md:border-0 md:pt-0">
-                      <div className="text-xl md:text-2xl font-bold text-accent">
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-lg md:text-xl font-bold text-accent">
                         ৳{Number(sale.total_amount).toLocaleString()}
                       </div>
-                      {Number((sale as any).due_amount) > 0 && (
+                      {Number(sale.due_amount) > 0 && (
                         <div className="text-xs font-semibold text-destructive">
-                          বাকি: ৳{Number((sale as any).due_amount).toLocaleString()}
+                          বাকি: ৳{Number(sale.due_amount).toLocaleString()}
                         </div>
                       )}
                     </div>
@@ -488,43 +522,65 @@ export function Sales() {
       <Dialog open={!!selectedSale} onOpenChange={() => setSelectedSale(null)}>
         <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg md:text-2xl">Sale Details</DialogTitle>
+            <DialogTitle className="text-lg md:text-2xl">বিক্রয়ের বিবরণ</DialogTitle>
             <DialogDescription className="text-sm">
-              Complete information about this transaction
+              এই লেনদেনের সম্পূর্ণ তথ্য
             </DialogDescription>
           </DialogHeader>
 
           {selectedSale && (
             <div className="space-y-4 md:space-y-6">
+              {/* Sale Image */}
+              {selectedSale.image_url && (
+                <Card>
+                  <CardHeader className="p-3 md:p-6 pb-2">
+                    <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                      <ImageIcon className="h-4 w-4 md:h-5 md:w-5" />
+                      বিক্রয়ের ছবি
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-3 md:p-6 pt-0">
+                    <div className="w-full max-w-xs rounded-lg overflow-hidden border border-border">
+                      <img
+                        src={getOptimizedUrl(selectedSale.image_url, { width: 400 })}
+                        alt="বিক্রয়ের ছবি"
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Sale Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Sale ID</CardDescription>
-                    <CardTitle className="text-sm md:text-base font-mono break-all">#{selectedSale.id}</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">সেল আইডি</CardDescription>
+                    <CardTitle className="text-sm md:text-base font-mono break-all">#{selectedSale.id.slice(0, 8)}</CardTitle>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Date & Time</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">তারিখ ও সময়</CardDescription>
                     <CardTitle className="text-sm md:text-base">
-                      <span className="hidden sm:inline">{format(new Date(selectedSale.created_at), "dd MMM yyyy, hh:mm a")}</span>
-                      <span className="sm:hidden">{format(new Date(selectedSale.created_at), "dd MMM yyyy")}</span>
+                      {format(new Date(selectedSale.created_at), "dd MMM yyyy, hh:mm a")}
                     </CardTitle>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Payment Method</CardDescription>
-                    <CardTitle className="text-sm md:text-base capitalize">{selectedSale.payment_method}</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">পেমেন্ট পদ্ধতি</CardDescription>
+                    <CardTitle className="text-sm md:text-base capitalize">
+                      {selectedSale.payment_method === "cash" ? "নগদ" : selectedSale.payment_method === "card" ? "কার্ড" : selectedSale.payment_method === "mobile" ? "মোবাইল" : selectedSale.payment_method}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader className="pb-3 p-3 md:p-6">
-                    <CardDescription className="text-xs md:text-sm">Status</CardDescription>
+                    <CardDescription className="text-xs md:text-sm">স্ট্যাটাস</CardDescription>
                     <CardTitle className="text-sm md:text-base">
                       <Badge variant={selectedSale.status === "completed" ? "default" : "secondary"} className="text-xs">
-                        {selectedSale.status}
+                        {selectedSale.status === "completed" ? "সম্পন্ন" : selectedSale.status}
                       </Badge>
                     </CardTitle>
                   </CardHeader>
@@ -537,19 +593,19 @@ export function Sales() {
                   <CardHeader className="p-3 md:p-6">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2">
                       <User className="h-4 w-4 md:h-5 md:w-5" />
-                      Customer Information
+                      ক্রেতার তথ্য
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 p-3 md:p-6 pt-0">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                      <span className="text-xs md:text-sm text-muted-foreground">Name:</span>
+                      <span className="text-xs md:text-sm text-muted-foreground">নাম:</span>
                       <span className="text-sm md:text-base font-semibold">
                         {selectedSale.customers?.name || selectedSale.instant_customer_name}
                       </span>
                     </div>
                     {(selectedSale.customers?.phone || selectedSale.instant_customer_phone) && (
                       <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                        <span className="text-xs md:text-sm text-muted-foreground">Phone:</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">ফোন:</span>
                         <span className="text-sm md:text-base">
                           {selectedSale.customers?.phone || selectedSale.instant_customer_phone}
                         </span>
@@ -557,7 +613,7 @@ export function Sales() {
                     )}
                     {selectedSale.customers?.email && (
                       <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                        <span className="text-xs md:text-sm text-muted-foreground">Email:</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">ইমেইল:</span>
                         <span className="text-sm md:text-base">{selectedSale.customers.email}</span>
                       </div>
                     )}
@@ -565,43 +621,46 @@ export function Sales() {
                 </Card>
               )}
 
-              {/* Products */}
               <Card>
                 <CardHeader className="p-3 md:p-6">
                   <CardTitle className="text-base md:text-lg flex items-center gap-2">
                     <Package className="h-4 w-4 md:h-5 md:w-5" />
-                    Products Sold
+                    বিক্রিত পণ্য
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 md:p-6 pt-0">
                   <div className="space-y-3 md:space-y-4">
                     {(selectedSale.sale_items || []).map((item, index) => (
                       <div key={index}>
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
-                          <div className="flex-1 space-y-1">
-                            <div className="text-sm md:text-base font-semibold">{item.products.name}</div>
-                            <div className="text-xs md:text-sm text-muted-foreground space-y-0.5">
-                              {item.products.brand && (
-                                <div>Brand: {item.products.brand}</div>
-                              )}
-                              {item.products.model && (
-                                <div>Model: {item.products.model}</div>
-                              )}
-                              {item.products.imei && (
-                                <div className="break-all">IMEI: {item.products.imei}</div>
-                              )}
-                              {item.products.sku && (
-                                <div className="break-all">SKU: {item.products.sku}</div>
-                              )}
-                              <div>Condition: <Badge variant="outline" className="capitalize text-xs">{item.condition}</Badge></div>
+                        <div className="flex gap-3">
+                          {/* Product Image */}
+                          {item.products.image_url && (
+                            <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border border-border bg-muted">
+                              <img
+                                src={getOptimizedUrl(item.products.image_url, { width: 120, height: 120 })}
+                                alt={item.products.name}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                          </div>
-                          <div className="text-right space-y-1 border-t sm:border-0 pt-2 sm:pt-0">
-                            <div className="text-xs md:text-sm text-muted-foreground">
-                              {item.quantity} × ৳{Number(item.unit_price).toLocaleString()}
+                          )}
+                          <div className="flex-1 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
+                            <div className="flex-1 space-y-1">
+                              <div className="text-sm md:text-base font-semibold">{item.products.name}</div>
+                              <div className="text-xs md:text-sm text-muted-foreground space-y-0.5">
+                                {item.products.brand && <div>ব্র্যান্ড: {item.products.brand}</div>}
+                                {item.products.model && <div>মডেল: {item.products.model}</div>}
+                                {item.products.imei && <div className="break-all">IMEI: {item.products.imei}</div>}
+                                {item.products.sku && <div className="break-all">SKU: {item.products.sku}</div>}
+                                <div>অবস্থা: <Badge variant="outline" className="capitalize text-xs">{item.condition === "new" ? "নতুন" : item.condition === "used" ? "ব্যবহৃত" : item.condition}</Badge></div>
+                              </div>
                             </div>
-                            <div className="text-sm md:text-base font-semibold text-accent">
-                              ৳{Number(item.total_price).toLocaleString()}
+                            <div className="text-right space-y-1 border-t sm:border-0 pt-2 sm:pt-0">
+                              <div className="text-xs md:text-sm text-muted-foreground">
+                                {item.quantity} × ৳{Number(item.unit_price).toLocaleString()}
+                              </div>
+                              <div className="text-sm md:text-base font-semibold text-accent">
+                                ৳{Number(item.total_price).toLocaleString()}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -616,31 +675,31 @@ export function Sales() {
 
                   {/* Total */}
                   <div className="flex justify-between items-center">
-                    <span className="text-base md:text-lg font-semibold">Total Amount:</span>
+                    <span className="text-base md:text-lg font-semibold">মোট:</span>
                     <span className="text-xl md:text-2xl font-bold text-accent">
                       ৳{Number(selectedSale.total_amount).toLocaleString()}
                     </span>
                   </div>
-                  {Number((selectedSale as any).paid_amount) > 0 && (
+                  {Number(selectedSale.paid_amount) > 0 && (
                     <div className="flex justify-between items-center mt-1">
-                      <span className="text-sm text-muted-foreground">Paid:</span>
-                      <span className="text-sm">৳{Number((selectedSale as any).paid_amount).toLocaleString()}</span>
+                      <span className="text-sm text-muted-foreground">প্রদত্ত:</span>
+                      <span className="text-sm">৳{Number(selectedSale.paid_amount).toLocaleString()}</span>
                     </div>
                   )}
-                  {Number((selectedSale as any).due_amount) > 0 && (
+                  {Number(selectedSale.due_amount) > 0 && (
                     <div className="flex justify-between items-center mt-1">
-                      <span className="text-sm font-semibold text-destructive">Due:</span>
-                      <span className="text-sm font-bold text-destructive">৳{Number((selectedSale as any).due_amount).toLocaleString()}</span>
+                      <span className="text-sm font-semibold text-destructive">বাকি:</span>
+                      <span className="text-sm font-bold text-destructive">৳{Number(selectedSale.due_amount).toLocaleString()}</span>
                     </div>
                   )}
                 </CardContent>
               </Card>
 
               {/* Due Collection */}
-              {Number((selectedSale as any).due_amount) > 0 && (
+              {Number(selectedSale.due_amount) > 0 && (
                 <DueCollection
                   saleId={selectedSale.id}
-                  currentDue={Number((selectedSale as any).due_amount)}
+                  currentDue={Number(selectedSale.due_amount)}
                 />
               )}
 
@@ -648,7 +707,7 @@ export function Sales() {
               {selectedSale.notes && (
                 <Card>
                   <CardHeader className="p-3 md:p-6">
-                    <CardTitle className="text-base md:text-lg">Notes</CardTitle>
+                    <CardTitle className="text-base md:text-lg">নোট</CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 md:p-6 pt-0">
                     <p className="text-xs md:text-sm text-muted-foreground">{selectedSale.notes}</p>
