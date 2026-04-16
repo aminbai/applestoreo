@@ -266,7 +266,7 @@ export function POS() {
   const total = getTotal();
 
   return (
-    <div className="flex flex-col h-screen animate-fade-in">
+    <div className="flex flex-col h-screen animate-fade-in pb-16 lg:pb-0">
       <POSHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
