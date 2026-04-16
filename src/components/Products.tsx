@@ -711,6 +711,14 @@ export function Products() {
                       placeholder="Enter NID number"
                     />
                   </div>
+                  <div className="sm:col-span-2">
+                    <CloudinaryUpload
+                      currentImageUrl={formData.supplier_image_url}
+                      onUpload={(url) => setFormData({ ...formData, supplier_image_url: url })}
+                      folder="apple-store/suppliers"
+                      label="📸 সাপ্লায়ারের ছবি (ঐচ্ছিক)"
+                    />
+                  </div>
                 </div>
               </div>
 
