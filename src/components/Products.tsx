@@ -15,6 +15,8 @@ import { ProductQuickView } from "./ProductQuickView";
 import { Eye, ScanBarcode, Download, FileSpreadsheet, FileText, ChevronDown, ChevronUp, ArrowUpDown, Filter } from "lucide-react";
 import { ActivityLogger } from "@/hooks/useActivityLog";
 import * as XLSX from "xlsx";
+import { CloudinaryUpload } from "./CloudinaryUpload";
+import { isCloudinaryUrl } from "@/lib/cloudinary";
 export function Products() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -48,6 +50,7 @@ export function Products() {
     supplier_nid: "",
     warranty_expiry_date: "",
     warranty_status: "no_warranty",
+    image_url: "",
   });
 
   const queryClient = useQueryClient();
@@ -146,6 +149,7 @@ export function Products() {
       supplier_nid: "",
       warranty_expiry_date: "",
       warranty_status: "no_warranty",
+      image_url: "",
     });
   };
 
@@ -223,6 +227,7 @@ export function Products() {
       stock_quantity: 1,
       low_stock_threshold: 0,
       category_id: formData.category_id || null,
+      image_url: formData.image_url || null,
     };
 
     if (editingProduct) {
@@ -254,6 +259,7 @@ export function Products() {
       supplier_nid: product.supplier_nid || "",
       warranty_expiry_date: product.warranty_expiry_date || "",
       warranty_status: product.warranty_status || "no_warranty",
+      image_url: product.image_url || "",
     });
   };
 
@@ -706,6 +712,16 @@ export function Products() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Product Image */}
+              <div className="pt-4 border-t border-border">
+                <CloudinaryUpload
+                  currentImageUrl={formData.image_url}
+                  onUpload={(url) => setFormData({ ...formData, image_url: url })}
+                  folder="apple-store/products"
+                  label="📸 প্রোডাক্টের ছবি"
+                />
               </div>
 
               {/* Warranty Information (Optional) */}

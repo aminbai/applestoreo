@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { CloudinaryUpload } from "./CloudinaryUpload";
 
 export function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -20,6 +21,7 @@ export function Suppliers() {
     phone: "",
     address: "",
     notes: "",
+    image_url: "",
   });
 
   const queryClient = useQueryClient();
@@ -142,6 +144,7 @@ export function Suppliers() {
       phone: "",
       address: "",
       notes: "",
+      image_url: "",
     });
   };
 
@@ -162,6 +165,7 @@ export function Suppliers() {
       phone: supplier.phone || "",
       address: supplier.address || "",
       notes: supplier.notes || "",
+      image_url: supplier.image_url || "",
     });
   };
 
@@ -240,6 +244,12 @@ export function Suppliers() {
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 />
               </div>
+              <CloudinaryUpload
+                currentImageUrl={formData.image_url}
+                onUpload={(url) => setFormData({ ...formData, image_url: url })}
+                folder="apple-store/suppliers"
+                label="📸 সাপ্লায়ারের ছবি"
+              />
               <div className="flex gap-2 justify-end">
                 <Button
                   type="button"
