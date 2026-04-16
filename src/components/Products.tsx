@@ -48,6 +48,7 @@ export function Products() {
     supplier_name: "",
     supplier_mobile: "",
     supplier_nid: "",
+    supplier_image_url: "",
     warranty_expiry_date: "",
     warranty_status: "no_warranty",
     image_url: "",
