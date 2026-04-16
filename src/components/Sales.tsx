@@ -407,18 +407,42 @@ export function Sales() {
                   onClick={() => setSelectedSale(sale)}
                   className="border border-border rounded-lg p-3 md:p-4 hover:border-primary hover:bg-accent/5 cursor-pointer transition-all card-hover"
                 >
-                  <div className="flex flex-col gap-3">
-                    <div className="flex-1 space-y-2">
+                  <div className="flex gap-3">
+                    {/* Sale Image Thumbnail */}
+                    {sale.image_url && (
+                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-lg overflow-hidden border border-border bg-muted">
+                        <img
+                          src={getOptimizedUrl(sale.image_url, { width: 100, height: 100 })}
+                          alt="বিক্রয়ের ছবি"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    {/* Product thumbnail if no sale image */}
+                    {!sale.image_url && (sale.sale_items || [])[0]?.products?.image_url && (
+                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-lg overflow-hidden border border-border bg-muted">
+                        <img
+                          src={getOptimizedUrl((sale.sale_items || [])[0].products.image_url!, { width: 100, height: 100 })}
+                          alt="পণ্যের ছবি"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex-1 flex flex-col gap-2">
                       <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                         <span className="font-mono text-xs md:text-sm font-semibold text-primary">
                           #{sale.id.slice(0, 8)}
                         </span>
                         <Badge variant={sale.status === "completed" ? "default" : "secondary"} className="text-xs">
-                          {sale.status}
+                          {sale.status === "completed" ? "সম্পন্ন" : sale.status}
                         </Badge>
                         <Badge variant="outline" className="capitalize text-xs">
-                          {sale.payment_method}
+                          {sale.payment_method === "cash" ? "নগদ" : sale.payment_method === "card" ? "কার্ড" : sale.payment_method === "mobile" ? "মোবাইল" : sale.payment_method}
                         </Badge>
+                        {sale.image_url && (
+                          <ImageIcon className="h-3 w-3 text-muted-foreground" />
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground flex-wrap">
@@ -435,18 +459,23 @@ export function Sales() {
                         )}
                         <div className="flex items-center gap-1">
                           <Package className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                          {(sale.sale_items || []).length} {(sale.sale_items || []).length === 1 ? "item" : "items"}
+                          {(sale.sale_items || []).length} টি পণ্য
                         </div>
+                      </div>
+
+                      {/* Product names preview */}
+                      <div className="text-xs text-muted-foreground truncate">
+                        {(sale.sale_items || []).map(i => i.products?.name).filter(Boolean).join(", ")}
                       </div>
                     </div>
 
-                    <div className="text-right border-t border-border pt-2 md:border-0 md:pt-0">
-                      <div className="text-xl md:text-2xl font-bold text-accent">
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-lg md:text-xl font-bold text-accent">
                         ৳{Number(sale.total_amount).toLocaleString()}
                       </div>
-                      {Number((sale as any).due_amount) > 0 && (
+                      {Number(sale.due_amount) > 0 && (
                         <div className="text-xs font-semibold text-destructive">
-                          বাকি: ৳{Number((sale as any).due_amount).toLocaleString()}
+                          বাকি: ৳{Number(sale.due_amount).toLocaleString()}
                         </div>
                       )}
                     </div>
