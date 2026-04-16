@@ -218,12 +218,17 @@ export function Products() {
       });
     }
 
+    // Brand comes from category, model comes from product name
+    const selectedCategory = categories?.find(c => c.id === formData.category_id);
+    const brandFromCategory = selectedCategory?.name || formData.brand || '';
+
     const submitData = {
       ...formData,
       sku: editingProduct ? formData.sku : generateSKU(),
       barcode: editingProduct ? formData.barcode : generateBarcode(),
-      brand: formData.brand || extractBrand(formData.name),
-      model: formData.model || extractModel(formData.name),
+      brand: brandFromCategory,
+      model: formData.model || formData.name,
+      name: brandFromCategory ? `${brandFromCategory} ${formData.name}` : formData.name,
       price: price,
       cost: cost,
       stock_quantity: 1,
@@ -553,7 +558,7 @@ export function Products() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Product Name *</label>
+                  <label className="block text-sm font-medium mb-2">মডেল / প্রোডাক্ট নাম *</label>
                   <Input
                     value={formData.name}
                     onChange={(e) => {
@@ -561,18 +566,25 @@ export function Products() {
                       setFormData({ 
                         ...formData, 
                         name: newName,
-                        brand: extractBrand(newName),
-                        model: extractModel(newName)
+                        model: newName
                       });
                     }}
+                    placeholder="শুধু মডেলের তথ্য দিন (ব্র্যান্ড ক্যাটাগরি থেকে আসবে)"
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
-                  <Select value={formData.category_id} onValueChange={(value) => setFormData({ ...formData, category_id: value })}>
+                  <Select value={formData.category_id} onValueChange={(value) => {
+                    const selectedCat = categories?.find(c => c.id === value);
+                    setFormData({ 
+                      ...formData, 
+                      category_id: value,
+                      brand: selectedCat?.name || formData.brand
+                    });
+                  }}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder="ক্যাটাগরি নির্বাচন করুন (ব্র্যান্ড)" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories?.map((cat) => (
@@ -731,7 +743,7 @@ export function Products() {
                   currentImageUrl={formData.image_url}
                   onUpload={(url) => setFormData({ ...formData, image_url: url })}
                   folder="apple-store/products"
-                  label="📸 প্রোডাক্টের ছবি"
+                  label="📸 প্রোডাক্টের ছবি (ঐচ্ছিক)"
                 />
               </div>
 
