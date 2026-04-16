@@ -137,6 +137,7 @@ export function POS() {
       setInstantCustomerName("");
       setInstantCustomerPhone("");
       setPaidAmount(0);
+      setSaleImageUrl("");
     },
     onError: (error: any) => {
       toast.error(error.message || "বিক্রয় সম্পন্ন করতে ব্যর্থ");
@@ -219,6 +220,7 @@ export function POS() {
       instant_customer_phone: instantCustomerPhone || null,
       paid_amount: paidAmount,
       due_amount: dueAmount,
+      image_url: saleImageUrl || null,
       items: cart.map(item => ({
         product_id: item.product.id,
         quantity: item.quantity,
