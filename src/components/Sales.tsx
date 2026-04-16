@@ -226,8 +226,8 @@ export function Sales() {
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-4 space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Sales History</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">View and manage all sales transactions</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">বিক্রয় ইতিহাস</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">সকল বিক্রয় লেনদেন দেখুন ও পরিচালনা করুন</p>
           </div>
         <div className="flex flex-wrap gap-2">
           <Button
