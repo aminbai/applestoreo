@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { bn } from "date-fns/locale";
-import { Search, Users, Wallet, AlertTriangle, Eye, Pencil, Trash2, Plus } from "lucide-react";
+import { Search, Users, Wallet, AlertTriangle, Eye, Pencil, Trash2, Plus, ChevronDown, ChevronUp, ArrowUpDown, Filter } from "lucide-react";
 import { DueCollection } from "./DueCollection";
 import { CustomerPDFReport } from "./CustomerPDFReport";
 
