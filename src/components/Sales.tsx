@@ -25,6 +25,9 @@ interface SaleDetail {
   customer_id: string | null;
   instant_customer_name: string | null;
   instant_customer_phone: string | null;
+  paid_amount: number;
+  due_amount: number;
+  image_url: string | null;
   customers: {
     name: string;
     phone: string | null;
@@ -41,6 +44,7 @@ interface SaleDetail {
       imei: string | null;
       brand: string | null;
       model: string | null;
+      image_url: string | null;
     };
   }>;
 }
