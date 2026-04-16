@@ -257,19 +257,19 @@ export function Sales() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
         <Card className="card-hover">
           <CardHeader className="pb-3 p-4 md:p-6">
-            <CardDescription className="text-xs md:text-sm">Total Sales</CardDescription>
+            <CardDescription className="text-xs md:text-sm">মোট বিক্রয়</CardDescription>
             <CardTitle className="text-2xl md:text-3xl text-primary">{totalSales}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="card-hover hidden lg:block">
           <CardHeader className="pb-3 p-4 md:p-6">
-            <CardDescription className="text-xs md:text-sm">Total Revenue</CardDescription>
+            <CardDescription className="text-xs md:text-sm">মোট আয়</CardDescription>
             <CardTitle className="text-2xl md:text-3xl text-accent">৳{totalRevenue.toLocaleString()}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="card-hover hidden lg:block">
           <CardHeader className="pb-3 p-4 md:p-6">
-            <CardDescription className="text-xs md:text-sm">Average Sale</CardDescription>
+            <CardDescription className="text-xs md:text-sm">গড় বিক্রয়</CardDescription>
             <CardTitle className="text-2xl md:text-3xl text-secondary">৳{averageSale.toFixed(0)}</CardTitle>
           </CardHeader>
         </Card>
