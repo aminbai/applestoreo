@@ -311,7 +311,7 @@ export function Sales() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by ID, customer, product..."
+                  placeholder="আইডি, কাস্টমার, পণ্য দিয়ে সার্চ..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 text-sm md:text-base"
@@ -348,7 +348,7 @@ export function Sales() {
                   <SelectValue placeholder="All Customers" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
+                  <SelectItem value="all">সকল কাস্টমার</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
@@ -365,11 +365,11 @@ export function Sales() {
                   <SelectValue placeholder="All Payment Methods" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Methods</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="card">Card</SelectItem>
-                  <SelectItem value="mobile">Mobile Banking</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="all">সকল পদ্ধতি</SelectItem>
+                  <SelectItem value="cash">নগদ</SelectItem>
+                  <SelectItem value="card">কার্ড</SelectItem>
+                  <SelectItem value="mobile">মোবাইল ব্যাংকিং</SelectItem>
+                  <SelectItem value="other">অন্যান্য</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -385,17 +385,17 @@ export function Sales() {
         <Card>
         <CardHeader className="p-4 md:p-6">
           <CardTitle className="text-base md:text-lg">
-            Sales List ({filteredSales.length} {filteredSales.length === 1 ? "sale" : "sales"})
+            বিক্রয় তালিকা ({filteredSales.length} টি)
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 md:p-6 pt-0">
           {paginatedSales.length === 0 ? (
             <div className="text-center py-8 md:py-12 text-muted-foreground">
               <Package className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 opacity-50" />
-              <p className="text-sm md:text-base">No sales found</p>
+              <p className="text-sm md:text-base">কোনো বিক্রয় পাওয়া যায়নি</p>
               {hasActiveFilters && (
                 <Button variant="link" onClick={clearFilters} className="mt-2 text-sm md:text-base">
-                  Clear filters to see all sales
+                  সকল বিক্রয় দেখতে ফিল্টার মুছুন
                 </Button>
               )}
             </div>
