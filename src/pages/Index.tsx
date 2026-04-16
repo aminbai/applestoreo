@@ -110,13 +110,13 @@ export default function Index({ user }: IndexProps) {
   }
 
   const allMenuItems = [
-    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard, permission: 'canAccessDashboard' },
-    { id: "products", label: "পণ্য", icon: Package, permission: 'canManageProducts' },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, permission: 'canAccessDashboard' },
+    { id: "products", label: "Products", icon: Package, permission: 'canManageProducts' },
     { id: "pos", label: "POS", icon: ShoppingCart, permission: 'canAccessPOS' },
-    { id: "sales", label: "বিক্রয়", icon: TrendingUp, permission: 'canAccessSales' },
-    { id: "investments", label: "ইনভেস্টমেন্ট", icon: Wallet, permission: 'canAccessReports' },
-    { id: "reports", label: "রিপোর্ট", icon: FileText, permission: 'canAccessReports' },
-    { id: "settings", label: "সেটিংস", icon: SettingsIcon, permission: 'canAccessSettings' },
+    { id: "sales", label: "Sales", icon: TrendingUp, permission: 'canAccessSales' },
+    { id: "investments", label: "Investments", icon: Wallet, permission: 'canAccessReports' },
+    { id: "reports", label: "Reports", icon: FileText, permission: 'canAccessReports' },
+    { id: "settings", label: "Settings", icon: SettingsIcon, permission: 'canAccessSettings' },
   ];
 
   const menuItems = allMenuItems.filter(item => {
@@ -209,7 +209,7 @@ export default function Index({ user }: IndexProps) {
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-all duration-300 text-[15px]"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium tracking-tight">লগআউট</span>
+              <span className="font-medium tracking-tight">Logout</span>
             </button>
           </div>
         </div>
