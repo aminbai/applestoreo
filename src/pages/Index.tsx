@@ -153,6 +153,7 @@ export default function Index({ user }: IndexProps) {
       case "returns": return <Returns />;
       case "investments": return <Investments />;
       case "customers": return <Customers />;
+      case "customer-details": return <CustomerDetails />;
       case "suppliers": return <Suppliers />;
       case "reports": return <Reports />;
       case "settings": return <Settings />;
