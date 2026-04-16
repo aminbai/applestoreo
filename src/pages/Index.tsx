@@ -5,6 +5,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { Products } from "@/components/Products";
 import { POS } from "@/components/POS";
 import { Customers } from "@/components/Customers";
+import { CustomerDetails } from "@/components/CustomerDetails";
 import { Suppliers } from "@/components/Suppliers";
 import { Reports } from "@/components/Reports";
 import { Settings } from "@/components/Settings";
