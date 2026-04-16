@@ -522,9 +522,9 @@ export function Sales() {
       <Dialog open={!!selectedSale} onOpenChange={() => setSelectedSale(null)}>
         <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg md:text-2xl">Sale Details</DialogTitle>
+            <DialogTitle className="text-lg md:text-2xl">বিক্রয়ের বিবরণ</DialogTitle>
             <DialogDescription className="text-sm">
-              Complete information about this transaction
+              এই লেনদেনের সম্পূর্ণ তথ্য
             </DialogDescription>
           </DialogHeader>
 
