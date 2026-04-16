@@ -461,11 +461,11 @@ export function Products() {
   return (
     <div className="flex flex-col h-screen animate-fade-in">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-4 space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-3 lg:pb-4 space-y-3 lg:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 lg:gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Products</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">Manage your inventory</p>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Products</h1>
+            <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-1">Manage your inventory</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {/* Download Buttons */}
@@ -819,10 +819,10 @@ export function Products() {
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-6">
+      <div className="flex-1 overflow-y-auto pb-20 lg:pb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4 pb-6">
         {filteredProducts?.map((product) => (
-          <Card key={product.id} className="p-6 card-hover">
+          <Card key={product.id} className="p-4 lg:p-6 card-hover">
             <div className="space-y-4">
               <div className="flex items-start justify-between">
               <div className="flex-1">
