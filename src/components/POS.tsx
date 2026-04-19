@@ -31,6 +31,7 @@ export function POS() {
   const [instantCustomerPhone, setInstantCustomerPhone] = useState("");
   const [paidAmount, setPaidAmount] = useState(0);
   const [saleImageUrl, setSaleImageUrl] = useState("");
+  const { containerRef, hidden: headerHidden } = useAutoHideHeader<HTMLDivElement>();
 
   const queryClient = useQueryClient();
 
@@ -280,9 +281,10 @@ export function POS() {
         showOutOfStock={showOutOfStock}
         onShowOutOfStockChange={setShowOutOfStock}
         onOpenScanner={() => setShowScanner(true)}
+        hidden={headerHidden}
       />
 
-      <div className="flex-1 flex lg:flex-row flex-col overflow-y-auto lg:overflow-hidden">
+      <div ref={containerRef} className="flex-1 flex lg:flex-row flex-col overflow-y-auto lg:overflow-hidden">
         {/* Products Section */}
         <div className="flex-1 lg:flex-[2] lg:overflow-y-auto p-3 lg:p-6 order-2 lg:order-1">
           <ProductGrid products={filteredProducts} onAddToCart={addToCart} />

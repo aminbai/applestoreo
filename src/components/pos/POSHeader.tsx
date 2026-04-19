@@ -13,6 +13,7 @@ interface POSHeaderProps {
   showOutOfStock: boolean;
   onShowOutOfStockChange: (checked: boolean) => void;
   onOpenScanner: () => void;
+  hidden?: boolean;
 }
 
 export function POSHeader({
@@ -23,12 +24,13 @@ export function POSHeader({
   showOutOfStock,
   onShowOutOfStockChange,
   onOpenScanner,
+  hidden = false,
 }: POSHeaderProps) {
   const { settings, logoSrc } = useShopSettings();
   const [showHeaderInfo, setShowHeaderInfo] = useState(true);
 
   return (
-    <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50 p-4 lg:pb-4 space-y-3 lg:space-y-4">
+    <div className={`sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50 p-4 lg:pb-4 space-y-3 lg:space-y-4 transition-transform duration-300 ${hidden ? '-translate-y-full lg:translate-y-0' : 'translate-y-0'}`}>
       <div className="flex items-start justify-between gap-2 min-w-0">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
