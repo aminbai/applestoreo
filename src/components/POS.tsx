@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { InvoiceModal } from "./InvoiceModal";
 import { BarcodeScanner } from "./BarcodeScanner";
 import { ActivityLogger } from "@/hooks/useActivityLog";
+import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 
 // Sub-components
 import { CartItem, Product, Customer } from "./pos/types";
