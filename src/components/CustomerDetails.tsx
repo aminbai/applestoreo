@@ -152,19 +152,31 @@ export function CustomerDetails() {
   );
 
   return (
-    <div className="space-y-3 lg:space-y-5 pb-20">
+    <div className="space-y-3 lg:space-y-5 pb-20 overflow-x-hidden w-full max-w-full">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-3 border-b border-border">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div>
-            <h1 className="text-lg lg:text-2xl font-bold text-foreground flex items-center gap-2">
-              <Users className="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
-              কাস্টমার ডিটেইলস
-            </h1>
-            <p className="text-[11px] lg:text-sm text-muted-foreground mt-0.5">কাস্টমার নির্বাচন করে সম্পূর্ণ লেনদেন ও বাকি হিসাব দেখুন</p>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg lg:text-2xl font-bold text-foreground flex items-center gap-2 truncate">
+                <Users className="w-5 h-5 lg:w-6 lg:h-6 text-primary shrink-0" />
+                কাস্টমার ডিটেইলস
+              </h1>
+              <button
+                type="button"
+                className="lg:hidden h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-muted shrink-0"
+                onClick={() => setShowHeaderInfo(v => !v)}
+                aria-label={showHeaderInfo ? "হেডার লুকান" : "হেডার দেখান"}
+              >
+                {showHeaderInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+            <p className={`text-[11px] lg:text-sm text-muted-foreground mt-0.5 ${showHeaderInfo ? "block" : "hidden lg:block"}`}>কাস্টমার নির্বাচন করে সম্পূর্ণ লেনদেন ও বাকি হিসাব দেখুন</p>
           </div>
           {selectedCustomer && (
-            <CustomerPDFReport customer={selectedCustomer} dueMap={dueMap} allSales={customerSales || []} />
+            <div className={showHeaderInfo ? "block" : "hidden lg:block"}>
+              <CustomerPDFReport customer={selectedCustomer} dueMap={dueMap} allSales={customerSales || []} />
+            </div>
           )}
         </div>
 
