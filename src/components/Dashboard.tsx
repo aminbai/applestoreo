@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useShopSettings } from "@/hooks/useShopSettings";
 import { MobileDashboardWidget } from "./MobileDashboardWidget";
 import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard, ShoppingCart, Award, BarChart3, ChevronUp, ChevronDown } from "lucide-react";
+import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
@@ -18,6 +19,7 @@ interface DashboardProps {
 export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardProps = {}) {
   const { settings, logoSrc } = useShopSettings();
   const [showHeaderInfo, setShowHeaderInfo] = useState(true);
+  const { containerRef, hidden: headerHidden } = useAutoHideHeader<HTMLDivElement>();
 
   const { data: products, isLoading: productsLoading } = useQuery({
     queryKey: ["products"],
@@ -252,7 +254,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
 
   return (
     <div className="flex flex-col h-screen animate-fade-in overflow-x-hidden w-full max-w-full">
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50 pb-3 lg:pb-4">
+      <div className={`sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50 pb-3 lg:pb-4 transition-transform duration-300 ${headerHidden ? '-translate-y-full lg:translate-y-0' : 'translate-y-0'}`}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
@@ -272,7 +274,7 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-20 lg:pb-6 space-y-4 lg:space-y-6">
+      <div ref={containerRef} className="flex-1 overflow-y-auto pb-20 lg:pb-6 space-y-4 lg:space-y-6">
         <MobileDashboardWidget onNavigateToPOS={onNavigateToPOS} onNavigateToProducts={onNavigateToProducts} />
 
         {/* KPI Cards */}

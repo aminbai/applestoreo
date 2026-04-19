@@ -13,6 +13,7 @@ import { ProductDetailModal } from "./ProductDetailModal";
 import { BarcodeScanner } from "./BarcodeScanner";
 import { ProductQuickView } from "./ProductQuickView";
 import { Eye, ScanBarcode, Download, FileSpreadsheet, FileText, ChevronDown, ChevronUp, ArrowUpDown, Filter } from "lucide-react";
+import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 import { ActivityLogger } from "@/hooks/useActivityLog";
 import * as XLSX from "xlsx";
 import { CloudinaryUpload } from "./CloudinaryUpload";
@@ -30,6 +31,7 @@ export function Products() {
   const [showOutOfStock, setShowOutOfStock] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [showHeader, setShowHeader] = useState(true);
+  const { containerRef, hidden: headerHidden } = useAutoHideHeader<HTMLDivElement>();
   const [sortBy, setSortBy] = useState<"name" | "price_high" | "price_low" | "newest" | "oldest">("name");
   const [formData, setFormData] = useState({
     name: "",
@@ -491,7 +493,7 @@ export function Products() {
   return (
     <div className="flex flex-col h-screen animate-fade-in overflow-x-hidden w-full max-w-full">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-3 lg:pb-4 space-y-3 lg:space-y-4">
+      <div className={`sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-3 lg:pb-4 space-y-3 lg:space-y-4 transition-transform duration-300 ${headerHidden ? '-translate-y-full lg:translate-y-0' : 'translate-y-0'}`}>
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 lg:gap-4 min-w-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
@@ -904,7 +906,7 @@ export function Products() {
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pb-20 lg:pb-6">
+      <div ref={containerRef} className="flex-1 overflow-y-auto pb-20 lg:pb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4 pb-6">
         {filteredProducts?.map((product) => (
           <Card key={product.id} className="p-4 lg:p-6 card-hover">
