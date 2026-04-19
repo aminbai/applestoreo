@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { Search, Calendar, User, CreditCard, Package, Filter, X, FileDown, FileSpreadsheet, ImageIcon } from "lucide-react";
+import { Search, Calendar, User, CreditCard, Package, Filter, X, FileDown, FileSpreadsheet, ImageIcon, ChevronUp, ChevronDown } from "lucide-react";
 import { getOptimizedUrl, isCloudinaryUrl } from "@/lib/cloudinary";
 import { useReactToPrint } from "react-to-print";
 import * as XLSX from "xlsx";
@@ -58,6 +58,7 @@ export function Sales() {
   const [selectedSale, setSelectedSale] = useState<SaleDetail | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [showHeaderInfo, setShowHeaderInfo] = useState(true);
   const itemsPerPage = 10;
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -221,15 +222,25 @@ export function Sales() {
   }
 
   return (
-    <div className="flex flex-col h-screen animate-fade-in">
+    <div className="flex flex-col h-screen animate-fade-in overflow-x-hidden w-full max-w-full">
       {/* Fixed Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-4 space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">বিক্রয় ইতিহাস</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">সকল বিক্রয় লেনদেন দেখুন ও পরিচালনা করুন</p>
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">বিক্রয় ইতিহাস</h1>
+              <button
+                type="button"
+                className="lg:hidden h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-muted shrink-0"
+                onClick={() => setShowHeaderInfo(v => !v)}
+                aria-label={showHeaderInfo ? "হেডার লুকান" : "হেডার দেখান"}
+              >
+                {showHeaderInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+            <p className={`text-sm md:text-base text-muted-foreground mt-1 ${showHeaderInfo ? "block" : "hidden lg:block"}`}>সকল বিক্রয় লেনদেন দেখুন ও পরিচালনা করুন</p>
           </div>
-        <div className="flex flex-wrap gap-2">
+        <div className={`flex-wrap gap-2 ${showHeaderInfo ? "flex" : "hidden lg:flex"}`}>
           <Button
             onClick={handlePrint}
             variant="outline"

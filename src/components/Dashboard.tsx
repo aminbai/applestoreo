@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useShopSettings } from "@/hooks/useShopSettings";
 import { MobileDashboardWidget } from "./MobileDashboardWidget";
-import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard, ShoppingCart, Award, BarChart3 } from "lucide-react";
+import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard, ShoppingCart, Award, BarChart3, ChevronUp, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
@@ -17,6 +17,7 @@ interface DashboardProps {
 
 export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardProps = {}) {
   const { settings, logoSrc } = useShopSettings();
+  const [showHeaderInfo, setShowHeaderInfo] = useState(true);
 
   const { data: products, isLoading: productsLoading } = useQuery({
     queryKey: ["products"],
@@ -250,14 +251,24 @@ export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardPr
   const monthlyChartConfig = { current: { label: "এই মাস", color: "hsl(142, 76%, 36%)" }, previous: { label: "গত মাস", color: "hsl(215, 20%, 65%)" } };
 
   return (
-    <div className="flex flex-col h-screen animate-fade-in">
+    <div className="flex flex-col h-screen animate-fade-in overflow-x-hidden w-full max-w-full">
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/50 pb-3 lg:pb-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">ড্যাশবোর্ড</h1>
-            <p className="text-muted-foreground mt-1 text-xs sm:text-sm lg:text-base">স্বাগতম! আপনার ব্যবসার সারসংক্ষেপ দেখুন।</p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate">ড্যাশবোর্ড</h1>
+              <button
+                type="button"
+                className="lg:hidden h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-muted shrink-0"
+                onClick={() => setShowHeaderInfo(v => !v)}
+                aria-label={showHeaderInfo ? "হেডার লুকান" : "হেডার দেখান"}
+              >
+                {showHeaderInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+            <p className={`text-muted-foreground mt-1 text-xs sm:text-sm lg:text-base ${showHeaderInfo ? "block" : "hidden lg:block"}`}>স্বাগতম! আপনার ব্যবসার সারসংক্ষেপ দেখুন।</p>
           </div>
-          <img src={logoSrc} alt={settings.shop_name} className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20" />
+          <img src={logoSrc} alt={settings.shop_name} className={`w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 shrink-0 ${showHeaderInfo ? "block" : "hidden lg:block"}`} />
         </div>
       </div>
 

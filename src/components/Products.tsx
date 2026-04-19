@@ -29,6 +29,7 @@ export function Products() {
   const [showScanner, setShowScanner] = useState(false);
   const [showOutOfStock, setShowOutOfStock] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const [showHeader, setShowHeader] = useState(true);
   const [sortBy, setSortBy] = useState<"name" | "price_high" | "price_low" | "newest" | "oldest">("name");
   const [formData, setFormData] = useState({
     name: "",
@@ -488,15 +489,26 @@ export function Products() {
   };
 
   return (
-    <div className="flex flex-col h-screen animate-fade-in">
+    <div className="flex flex-col h-screen animate-fade-in overflow-x-hidden w-full max-w-full">
       {/* Fixed Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-border pb-3 lg:pb-4 space-y-3 lg:space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 lg:gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Products</h1>
-            <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-1">Manage your inventory</p>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 lg:gap-4 min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate">Products</h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 lg:hidden shrink-0"
+                onClick={() => setShowHeader(!showHeader)}
+                aria-label={showHeader ? "হেডার লুকান" : "হেডার দেখান"}
+              >
+                {showHeader ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </Button>
+            </div>
+            <p className={`text-xs sm:text-sm lg:text-base text-muted-foreground mt-1 ${showHeader ? "block" : "hidden lg:block"}`}>Manage your inventory</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className={`flex-wrap items-center gap-2 ${showHeader ? "flex" : "hidden lg:flex"}`}>
             {/* Download Buttons */}
             <Button
               onClick={downloadExcel}
