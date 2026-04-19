@@ -24,6 +24,7 @@ export function CustomerDetails() {
   const [showPaymentHistory, setShowPaymentHistory] = useState(true);
   const [showSalesHistory, setShowSalesHistory] = useState(true);
   const [showCustomerInfo, setShowCustomerInfo] = useState(true);
+  const [showHeaderInfo, setShowHeaderInfo] = useState(true);
   const [salesFilter, setSalesFilter] = useState<"all" | "due" | "paid">("all");
   const queryClient = useQueryClient();
 

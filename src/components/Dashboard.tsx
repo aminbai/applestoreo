@@ -17,6 +17,7 @@ interface DashboardProps {
 
 export function Dashboard({ onNavigateToPOS, onNavigateToProducts }: DashboardProps = {}) {
   const { settings, logoSrc } = useShopSettings();
+  const [showHeaderInfo, setShowHeaderInfo] = useState(true);
 
   const { data: products, isLoading: productsLoading } = useQuery({
     queryKey: ["products"],

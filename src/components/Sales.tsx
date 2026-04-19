@@ -58,6 +58,7 @@ export function Sales() {
   const [selectedSale, setSelectedSale] = useState<SaleDetail | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [showHeaderInfo, setShowHeaderInfo] = useState(true);
   const itemsPerPage = 10;
   const printRef = useRef<HTMLDivElement>(null);
 
