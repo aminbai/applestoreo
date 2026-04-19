@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useShopSettings } from "@/hooks/useShopSettings";
 import { MobileDashboardWidget } from "./MobileDashboardWidget";
-import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard, ShoppingCart, Award, BarChart3 } from "lucide-react";
+import { Wallet, TrendingUp, AlertCircle, PiggyBank, Users, CreditCard, ShoppingCart, Award, BarChart3, ChevronUp, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";

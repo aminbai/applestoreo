@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { Search, Calendar, User, CreditCard, Package, Filter, X, FileDown, FileSpreadsheet, ImageIcon } from "lucide-react";
+import { Search, Calendar, User, CreditCard, Package, Filter, X, FileDown, FileSpreadsheet, ImageIcon, ChevronUp, ChevronDown } from "lucide-react";
 import { getOptimizedUrl, isCloudinaryUrl } from "@/lib/cloudinary";
 import { useReactToPrint } from "react-to-print";
 import * as XLSX from "xlsx";
