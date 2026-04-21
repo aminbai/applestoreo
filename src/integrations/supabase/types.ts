@@ -287,6 +287,7 @@ export type Database = {
           sku: string | null
           stock_quantity: number
           storage: string | null
+          supplier_image_url: string | null
           supplier_mobile: string | null
           supplier_name: string | null
           supplier_nid: string | null
@@ -315,6 +316,7 @@ export type Database = {
           sku?: string | null
           stock_quantity?: number
           storage?: string | null
+          supplier_image_url?: string | null
           supplier_mobile?: string | null
           supplier_name?: string | null
           supplier_nid?: string | null
@@ -343,6 +345,7 @@ export type Database = {
           sku?: string | null
           stock_quantity?: number
           storage?: string | null
+          supplier_image_url?: string | null
           supplier_mobile?: string | null
           supplier_name?: string | null
           supplier_nid?: string | null
