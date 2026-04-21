@@ -54,7 +54,6 @@ export function Products() {
     supplier_image_url: "",
     warranty_expiry_date: "",
     warranty_status: "no_warranty",
-    image_url: "",
   });
 
   const queryClient = useQueryClient();
@@ -154,7 +153,6 @@ export function Products() {
       supplier_image_url: "",
       warranty_expiry_date: "",
       warranty_status: "no_warranty",
-      image_url: "",
     });
   };
 
@@ -237,7 +235,7 @@ export function Products() {
       stock_quantity: 1,
       low_stock_threshold: 0,
       category_id: formData.category_id || null,
-      image_url: formData.image_url || null,
+      supplier_image_url: formData.supplier_image_url || null,
     };
 
     if (editingProduct) {
@@ -267,10 +265,9 @@ export function Products() {
       supplier_name: product.supplier_name || "",
       supplier_mobile: product.supplier_mobile || "",
       supplier_nid: product.supplier_nid || "",
-      supplier_image_url: "",
+      supplier_image_url: product.supplier_image_url || "",
       warranty_expiry_date: product.warranty_expiry_date || "",
       warranty_status: product.warranty_status || "no_warranty",
-      image_url: product.image_url || "",
     });
   };
 
@@ -749,16 +746,6 @@ export function Products() {
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Product Image */}
-              <div className="pt-4 border-t border-border">
-                <CloudinaryUpload
-                  currentImageUrl={formData.image_url}
-                  onUpload={(url) => setFormData({ ...formData, image_url: url })}
-                  folder="apple-store/products"
-                  label="📸 প্রোডাক্টের ছবি (ঐচ্ছিক)"
-                />
               </div>
 
               {/* Warranty Information (Optional) */}
