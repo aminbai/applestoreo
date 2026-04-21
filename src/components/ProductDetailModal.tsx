@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { ZoomIn } from "lucide-react";
 
 interface ProductDetailModalProps {
   product: any;
@@ -13,6 +15,8 @@ interface ProductDetailModalProps {
 }
 
 export function ProductDetailModal({ product, isOpen, onClose }: ProductDetailModalProps) {
+  const [zoomImage, setZoomImage] = useState(false);
+
   // Fetch sales history for this product
   const { data: salesHistory } = useQuery({
     queryKey: ["product-sales-history", product?.id],
@@ -182,30 +186,69 @@ export function ProductDetailModal({ product, isOpen, onClose }: ProductDetailMo
           </Card>
 
           {/* Supplier Information */}
-          {(product.supplier_name || product.supplier_mobile || product.supplier_nid) && (
+          {(product.supplier_name || product.supplier_mobile || product.supplier_nid || product.supplier_image_url) && (
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-3">Supplier Information</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {product.supplier_name && (
-                  <div>
-                    <p className="text-muted-foreground">Name</p>
-                    <p className="font-medium">{product.supplier_name}</p>
-                  </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                {product.supplier_image_url && (
+                  <button
+                    type="button"
+                    onClick={() => setZoomImage(true)}
+                    className="relative group shrink-0 w-32 h-40 rounded-lg overflow-hidden border-2 border-border hover:border-primary transition-colors"
+                    aria-label="সাপ্লায়ারের ছবি জুম করুন"
+                  >
+                    <img
+                      src={product.supplier_image_url}
+                      alt={product.supplier_name || "Supplier"}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
+                      <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </button>
                 )}
-                {product.supplier_mobile && (
-                  <div>
-                    <p className="text-muted-foreground">Mobile</p>
-                    <p className="font-medium">{product.supplier_mobile}</p>
-                  </div>
-                )}
-                {product.supplier_nid && (
-                  <div className="col-span-2">
-                    <p className="text-muted-foreground">NID</p>
-                    <p className="font-medium">{product.supplier_nid}</p>
-                  </div>
-                )}
+                <div className="grid grid-cols-2 gap-4 text-sm flex-1">
+                  {product.supplier_name && (
+                    <div>
+                      <p className="text-muted-foreground">Name</p>
+                      <p className="font-medium">{product.supplier_name}</p>
+                    </div>
+                  )}
+                  {product.supplier_mobile && (
+                    <div>
+                      <p className="text-muted-foreground">Mobile</p>
+                      <p className="font-medium">{product.supplier_mobile}</p>
+                    </div>
+                  )}
+                  {product.supplier_nid && (
+                    <div className="col-span-2">
+                      <p className="text-muted-foreground">NID</p>
+                      <p className="font-medium">{product.supplier_nid}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
+          )}
+
+          {/* Zoomable supplier image dialog */}
+          {product.supplier_image_url && (
+            <Dialog open={zoomImage} onOpenChange={setZoomImage}>
+              <DialogContent className="max-w-2xl p-2 bg-black/95 border-none">
+                <DialogHeader>
+                  <DialogTitle className="text-white text-center text-base">
+                    {product.supplier_name || "সাপ্লায়ার"}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="overflow-auto max-h-[80vh] flex items-center justify-center">
+                  <img
+                    src={product.supplier_image_url}
+                    alt="Supplier zoom"
+                    className="max-w-full h-auto rounded"
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
 
           {/* Sales History */}
