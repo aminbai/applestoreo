@@ -122,20 +122,10 @@ export default function Index({ user }: IndexProps) {
     { id: "settings", label: "Settings", icon: SettingsIcon, permission: 'canAccessSettings' },
   ];
 
-  const menuItems = allMenuItems.filter(item => {
-    const permissionKey = item.permission as keyof typeof permissions;
-    return permissions[permissionKey];
-  });
+  // Show all menu items for all users
+  const menuItems = allMenuItems;
 
   const handleTabChange = (tabId: string) => {
-    const menuItem = allMenuItems.find(item => item.id === tabId);
-    if (menuItem) {
-      const permissionKey = menuItem.permission as keyof typeof permissions;
-      if (!permissions[permissionKey]) {
-        toast.error(`আপনার "${menuItem.label}" পেজে অ্যাক্সেস নেই`);
-        return;
-      }
-    }
     setActiveTab(tabId);
   };
 

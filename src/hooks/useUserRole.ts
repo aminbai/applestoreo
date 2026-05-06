@@ -20,6 +20,7 @@ export interface RolePermissions {
 }
 
 // Fallback permissions if DB fetch fails
+// All users get full access to all features
 const fallbackPermissions: Record<AppRole, RolePermissions> = {
   admin: {
     canAccessSettings: true, canAccessReports: true, canAccessUserManagement: true,
@@ -28,16 +29,16 @@ const fallbackPermissions: Record<AppRole, RolePermissions> = {
     canAccessReturns: true, canAccessDashboard: true, canBackupRestore: true, canResetData: true,
   },
   manager: {
-    canAccessSettings: false, canAccessReports: false, canAccessUserManagement: false,
-    canManageProducts: true, canManageCustomers: false, canManageSuppliers: false,
-    canManageCategories: false, canAccessPOS: false, canAccessSales: true,
-    canAccessReturns: false, canAccessDashboard: true, canBackupRestore: true, canResetData: false,
+    canAccessSettings: true, canAccessReports: true, canAccessUserManagement: true,
+    canManageProducts: true, canManageCustomers: true, canManageSuppliers: true,
+    canManageCategories: true, canAccessPOS: true, canAccessSales: true,
+    canAccessReturns: true, canAccessDashboard: true, canBackupRestore: true, canResetData: true,
   },
   staff: {
-    canAccessSettings: false, canAccessReports: false, canAccessUserManagement: false,
-    canManageProducts: false, canManageCustomers: false, canManageSuppliers: false,
-    canManageCategories: false, canAccessPOS: false, canAccessSales: true,
-    canAccessReturns: false, canAccessDashboard: true, canBackupRestore: false, canResetData: false,
+    canAccessSettings: true, canAccessReports: true, canAccessUserManagement: true,
+    canManageProducts: true, canManageCustomers: true, canManageSuppliers: true,
+    canManageCategories: true, canAccessPOS: true, canAccessSales: true,
+    canAccessReturns: true, canAccessDashboard: true, canBackupRestore: true, canResetData: true,
   },
 };
 

@@ -1,13 +1,20 @@
--- Make existing user as Admin
--- Run this in Supabase SQL Editor
+-- Create Admin User via Supabase SQL
+-- Run this in Supabase SQL Editor after creating the user via Auth
 
--- Update user role to admin
-UPDATE public.users
-SET role = 'admin', updated_at = now()
-WHERE email = 'admin@applestore.com';
+-- Step 1: First create the user in Supabase Auth (Settings → Authentication)
+-- Then insert into users table:
 
--- Verify admin user
-SELECT id, email, full_name, role, created_at FROM public.users WHERE email = 'admin@applestore.com';
+INSERT INTO public.users (
+  email,
+  full_name,
+  role
+) VALUES (
+  'admin@applestore.com',
+  'Admin User',
+  'admin'
+) ON CONFLICT (email) DO UPDATE SET
+  role = 'admin',
+  updated_at = now();
 
--- View all users
-SELECT id, email, full_name, role FROM public.users;
+-- Verify admin user created
+SELECT id, email, role, created_at FROM public.users WHERE email = 'admin@applestore.com';
