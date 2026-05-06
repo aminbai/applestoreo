@@ -18,6 +18,7 @@ import { StaffPerformanceReport } from "@/components/StaffPerformanceReport";
 import { useUserRole } from "@/hooks/useUserRole";
 import { ActivityLogger } from "@/hooks/useActivityLog";
 import { BrandingSettings } from "@/components/BrandingSettings";
+import { BackupImport } from "@/components/BackupImport";
 import { createBackup, restoreBackup, incrementalRestore } from "@/lib/backup-restore";
 import {
   AlertDialog,
@@ -629,6 +630,9 @@ export function Settings() {
           </div>
         </div>
       </Card>
+
+      {/* Import Old Backup */}
+      <BackupImport />
 
       {/* Reset Database */}
       <Card className="p-6 border-destructive/50">
