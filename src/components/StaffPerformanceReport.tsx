@@ -67,7 +67,7 @@ interface StaffPerformance {
 type ReportPeriod = 'today' | 'yesterday' | 'thisWeek' | 'lastWeek' | 'thisMonth' | 'lastMonth';
 
 export function StaffPerformanceReport() {
-  const { isAdmin, isManager, loading: roleLoading } = useUserRole();
+  const { loading: roleLoading } = useUserRole();
   const [period, setPeriod] = useState<ReportPeriod>('thisWeek');
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -110,7 +110,6 @@ export function StaffPerformanceReport() {
       if (error) throw error;
       return data;
     },
-    enabled: isAdmin || isManager,
   });
 
   // Fetch sales for the period
@@ -126,7 +125,6 @@ export function StaffPerformanceReport() {
       if (error) throw error;
       return data;
     },
-    enabled: isAdmin || isManager,
   });
 
   // Fetch profiles to map user_id to email
@@ -140,10 +138,6 @@ export function StaffPerformanceReport() {
       if (error) throw error;
       return data;
     },
-    enabled: isAdmin || isManager,
-  });
-
-  // Calculate staff performance
   const staffPerformance = useMemo(() => {
     if (!logs) return [];
 
@@ -257,17 +251,7 @@ export function StaffPerformanceReport() {
     );
   }
 
-  if (!isAdmin && !isManager) {
-    return (
-      <Card className="p-6">
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Shield className="w-12 h-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">অ্যাক্সেস সীমাবদ্ধ</h3>
-          <p className="text-muted-foreground">শুধুমাত্র এডমিন ও ম্যানেজার এই রিপোর্ট দেখতে পারেন।</p>
-        </div>
-      </Card>
-    );
-  }
+
 
   const isLoading = logsLoading || salesLoading;
 

@@ -70,7 +70,7 @@ interface UserActivitySummary {
 }
 
 export function ActivityLog() {
-  const { isAdmin, isManager, loading: roleLoading } = useUserRole();
+  const { loading: roleLoading } = useUserRole();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterUser, setFilterUser] = useState<string>('all');
@@ -97,7 +97,6 @@ export function ActivityLog() {
       if (error) throw error;
       return data as ActivityLogEntry[];
     },
-    enabled: isAdmin || isManager,
   });
 
   // Get unique users from logs
@@ -237,17 +236,7 @@ export function ActivityLog() {
     );
   }
 
-  if (!isAdmin && !isManager) {
-    return (
-      <Card className="p-6">
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Shield className="w-12 h-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">অ্যাক্সেস সীমাবদ্ধ</h3>
-          <p className="text-muted-foreground">শুধুমাত্র এডমিন ও ম্যানেজার অ্যাক্টিভিটি লগ দেখতে পারেন।</p>
-        </div>
-      </Card>
-    );
-  }
+
 
   return (
     <Card className="p-6">
