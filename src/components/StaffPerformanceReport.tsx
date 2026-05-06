@@ -138,6 +138,8 @@ export function StaffPerformanceReport() {
       if (error) throw error;
       return data;
     },
+  });
+
   const staffPerformance = useMemo(() => {
     if (!logs) return [];
 
