@@ -351,7 +351,7 @@ export function StaffPerformanceReport() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <div className="rounded-md border overflow-x-auto max-h-[400px] overflow-y-auto">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader className="sticky top-0 bg-card">
               <TableRow>
