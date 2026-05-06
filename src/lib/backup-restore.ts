@@ -64,6 +64,49 @@ const TABLE_DEFAULTS: Record<string, Record<string, any>> = {
 };
 
 /**
+ * Allowed fields for each table (to filter out extra fields)
+ */
+const ALLOWED_FIELDS: Record<string, Set<string>> = {
+  products: new Set([
+    'id', 'name', 'description', 'category_id', 'sku', 'barcode',
+    'price', 'cost', 'stock_quantity', 'low_stock_threshold', 'unit',
+    'image_url', 'created_at', 'updated_at', 'brand', 'condition', 'imei'
+  ]),
+  categories: new Set(['id', 'name', 'description', 'created_at', 'updated_at']),
+  customers: new Set([
+    'id', 'name', 'email', 'phone', 'address', 'notes', 'image_url',
+    'created_at', 'updated_at', 'total_purchases', 'purchase_count'
+  ]),
+  suppliers: new Set([
+    'id', 'name', 'email', 'phone', 'address', 'notes', 'created_at', 'updated_at'
+  ]),
+  sales: new Set([
+    'id', 'user_id', 'customer_id', 'invoice_number', 'total_amount',
+    'discount_amount', 'tax_amount', 'payment_method', 'payment_status',
+    'notes', 'created_at', 'updated_at'
+  ]),
+  sale_items: new Set([
+    'id', 'sale_id', 'product_id', 'quantity', 'unit_price', 'total_price',
+    'created_at', 'condition'
+  ]),
+  purchases: new Set([
+    'id', 'user_id', 'supplier_id', 'purchase_number', 'total_amount',
+    'status', 'notes', 'expected_date', 'created_at', 'updated_at'
+  ]),
+  purchase_items: new Set([
+    'id', 'purchase_id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+    'received_quantity', 'created_at'
+  ]),
+  returns: new Set([
+    'id', 'sale_id', 'return_number', 'reason', 'total_amount', 'status',
+    'created_at', 'updated_at'
+  ]),
+  invoices: new Set([
+    'id', 'sale_id', 'invoice_date', 'due_date', 'status', 'created_at', 'updated_at'
+  ])
+};
+
+/**
  * Calculate simple checksum for data integrity
  */
 function calculateChecksum(data: any[]): string {
@@ -72,15 +115,30 @@ function calculateChecksum(data: any[]): string {
 }
 
 /**
- * Validate and normalize records - fill missing fields with defaults
+ * Validate and normalize records - fill missing fields with defaults and remove extra fields
  */
 function normalizeRecord(record: any, tableName: string): any {
   const defaults = TABLE_DEFAULTS[tableName] || {};
-  const normalized = { ...record };
+  const allowedFields = ALLOWED_FIELDS[tableName];
+  
+  // Filter to only allowed fields
+  const normalized: any = {};
+  
+  if (allowedFields) {
+    // Only include allowed fields
+    allowedFields.forEach(field => {
+      if (field in record) {
+        normalized[field] = record[field];
+      }
+    });
+  } else {
+    // If no allowed fields defined, keep all fields
+    normalized = { ...record };
+  }
 
   // Add default values for missing fields
   Object.entries(defaults).forEach(([field, defaultValue]) => {
-    if (!(field in normalized) || normalized[field] === undefined) {
+    if (!(field in normalized) || normalized[field] === undefined || normalized[field] === null) {
       normalized[field] = defaultValue;
     }
   });
@@ -108,16 +166,20 @@ function normalizeBackupData(backup: BackupFile): BackupFile {
 
 /**
  * Validate backup file format and structure
+ * Supports both v1.0 (old) and v2.0 (new) formats
  */
 function validateBackupFile(backup: any): backup is BackupFile {
-  return (
-    backup &&
-    backup.metadata &&
-    backup.metadata.version &&
-    backup.metadata.timestamp &&
-    backup.data &&
-    typeof backup.data === 'object'
-  );
+  // Support both old and new formats
+  if (backup.metadata && backup.metadata.version && backup.data) {
+    return backup.metadata.version && typeof backup.data === 'object';
+  }
+  
+  // Support old format (v1.0) without metadata
+  if (backup.version === "1.0" && backup.data && typeof backup.data === 'object') {
+    return true;
+  }
+  
+  return false;
 }
 
 /**
@@ -243,7 +305,26 @@ export async function restoreBackup(
       throw new Error('Invalid backup file format. Missing metadata or data.');
     }
 
-    // Normalize backup data (fill missing fields)
+    // Convert old format (v1.0) to new format (v2.0)
+    if (backup.version === "1.0" && !backup.metadata) {
+      console.log('Converting old backup format (v1.0) to new format (v2.0)...');
+      backup = {
+        metadata: {
+          version: '2.0',
+          timestamp: backup.timestamp || new Date().toISOString(),
+          appVersion: '1.0.0',
+          tables: Object.keys(backup.data),
+          recordCounts: Object.fromEntries(
+            Object.entries(backup.data).map(([table, data]: [string, any]) => [table, data?.length || 0])
+          ),
+          checksums: {}
+        },
+        data: backup.data
+      };
+      toast.info('Converting old backup format...');
+    }
+
+    // Normalize backup data (fill missing fields and remove extra fields)
     if (validateSchema) {
       backup = normalizeBackupData(backup);
     }
@@ -290,8 +371,7 @@ export async function restoreBackup(
           for (const record of data) {
             const { error: singleError } = await supabase
               .from(table)
-              .insert([record])
-              .on('*', payload => console.log('Change received!', payload));
+              .insert([record]);
             
             if (!singleError) successCount++;
           }
@@ -372,6 +452,23 @@ export async function incrementalRestore(
       throw new Error('Invalid backup file format');
     }
 
+    // Convert old format if needed
+    if (backup.version === "1.0" && !backup.metadata) {
+      console.log('Converting old backup format (v1.0) to new format (v2.0)...');
+      backup = {
+        metadata: {
+          version: '2.0',
+          timestamp: backup.timestamp || new Date().toISOString(),
+          appVersion: '1.0.0',
+          tables: Object.keys(backup.data),
+          recordCounts: {},
+          checksums: {}
+        },
+        data: backup.data
+      };
+    }
+
+    // Normalize backup data
     backup = normalizeBackupData(backup);
     const tablesToRestore = selectedTables || backup.metadata.tables;
     const restoreDetails: Record<string, number> = {};
