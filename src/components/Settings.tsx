@@ -18,6 +18,7 @@ import { StaffPerformanceReport } from "@/components/StaffPerformanceReport";
 import { useUserRole } from "@/hooks/useUserRole";
 import { ActivityLogger } from "@/hooks/useActivityLog";
 import { BrandingSettings } from "@/components/BrandingSettings";
+import { createBackup, restoreBackup, incrementalRestore } from "@/lib/backup-restore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -173,52 +174,10 @@ export function Settings() {
   const handleBackup = async () => {
     setIsBackingUp(true);
     try {
-      toast.info("Starting backup...");
-
-      // Fetch all data from all tables
-      const [products, categories, customers, suppliers, sales, saleItems, purchases, purchaseItems, returns] = await Promise.all([
-        supabase.from("products").select("*"),
-        supabase.from("categories").select("*"),
-        supabase.from("customers").select("*"),
-        supabase.from("suppliers").select("*"),
-        supabase.from("sales").select("*"),
-        supabase.from("sale_items").select("*"),
-        supabase.from("purchases").select("*"),
-        supabase.from("purchase_items").select("*"),
-        supabase.from("returns").select("*"),
-      ]);
-
-      const backup = {
-        version: "1.0",
-        timestamp: new Date().toISOString(),
-        data: {
-          products: products.data || [],
-          categories: categories.data || [],
-          customers: customers.data || [],
-          suppliers: suppliers.data || [],
-          sales: sales.data || [],
-          sale_items: saleItems.data || [],
-          purchases: purchases.data || [],
-          purchase_items: purchaseItems.data || [],
-          returns: returns.data || [],
-        },
-      };
-
-      // Create and download JSON file
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `stockpro-backup-${new Date().toISOString().split("T")[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success("Backup completed successfully!");
+      await createBackup();
       await ActivityLogger.dataBackup();
     } catch (error: any) {
-      toast.error("Backup failed: " + error.message);
+      console.error('Backup error:', error);
     } finally {
       setIsBackingUp(false);
     }
@@ -232,89 +191,48 @@ export function Settings() {
     try {
       toast.info("Starting restore...");
 
-      const text = await file.text();
-      const backup = JSON.parse(text);
+      // Use advanced restore with merge mode to preserve existing data
+      // and handle missing fields automatically
+      const result = await restoreBackup(file, {
+        mergeMode: 'replace', // Replace old data with new backup
+        validateSchema: true,  // Normalize missing fields with defaults
+      });
 
-      if (!backup.version || !backup.data) {
-        throw new Error("Invalid backup file format");
+      if (result.success) {
+        toast.success("Data restored successfully! Refreshing...");
+        await ActivityLogger.dataRestore();
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        toast.error("Some records failed to restore. Check console for details.");
       }
-
-      // Clear existing data first (in correct order respecting foreign keys)
-      // 1. Delete returns first (references sale_items)
-      await supabase.from("returns").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      
-      // 2. Delete sale_items and purchase_items
-      await Promise.all([
-        supabase.from("sale_items").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-        supabase.from("purchase_items").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-      ]);
-
-      // 3. Delete sales and purchases
-      await Promise.all([
-        supabase.from("sales").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-        supabase.from("purchases").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-      ]);
-
-      // 4. Delete products (references categories)
-      await supabase.from("products").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-
-      // 5. Delete base tables
-      await Promise.all([
-        supabase.from("customers").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-        supabase.from("suppliers").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-        supabase.from("categories").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-      ]);
-
-      // Insert restored data
-      const insertPromises = [];
-
-      if (backup.data.categories?.length) {
-        insertPromises.push(supabase.from("categories").insert(backup.data.categories));
-      }
-      if (backup.data.suppliers?.length) {
-        insertPromises.push(supabase.from("suppliers").insert(backup.data.suppliers));
-      }
-      if (backup.data.customers?.length) {
-        insertPromises.push(supabase.from("customers").insert(backup.data.customers));
-      }
-      if (backup.data.products?.length) {
-        insertPromises.push(supabase.from("products").insert(backup.data.products));
-      }
-
-      await Promise.all(insertPromises);
-
-      // Insert sales and purchases
-      const transactionPromises = [];
-      if (backup.data.sales?.length) {
-        transactionPromises.push(supabase.from("sales").insert(backup.data.sales));
-      }
-      if (backup.data.purchases?.length) {
-        transactionPromises.push(supabase.from("purchases").insert(backup.data.purchases));
-      }
-
-      await Promise.all(transactionPromises);
-
-      // Insert related items
-      const itemPromises = [];
-      if (backup.data.sale_items?.length) {
-        itemPromises.push(supabase.from("sale_items").insert(backup.data.sale_items));
-      }
-      if (backup.data.purchase_items?.length) {
-        itemPromises.push(supabase.from("purchase_items").insert(backup.data.purchase_items));
-      }
-
-      await Promise.all(itemPromises);
-
-      // Insert returns last
-      if (backup.data.returns?.length) {
-        await supabase.from("returns").insert(backup.data.returns);
-      }
-
-      toast.success("Data restored successfully! Refreshing...");
-      await ActivityLogger.dataRestore();
-      setTimeout(() => window.location.reload(), 1500);
     } catch (error: any) {
       toast.error("Restore failed: " + error.message);
+      console.error("Restore error:", error);
+    } finally {
+      setIsRestoring(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleIncrementalRestore = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsRestoring(true);
+    try {
+      toast.info("Starting incremental restore...");
+
+      // Incremental restore - only adds new records, doesn't delete existing
+      const result = await incrementalRestore(file);
+
+      if (result.success) {
+        toast.success("New records added successfully!");
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        toast.error("Incremental restore failed.");
+      }
+    } catch (error: any) {
+      toast.error("Incremental restore failed: " + error.message);
     } finally {
       setIsRestoring(false);
       event.target.value = "";
@@ -666,25 +584,47 @@ export function Settings() {
           <div className="pt-4 border-t border-border">
             <h3 className="font-medium mb-2">Restore Database</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              Upload a backup file to restore your data. ⚠️ Warning: This will replace all existing data!
+              Upload a backup file to restore your data. This supports missing fields and will fill them with defaults automatically.
             </p>
-            <div>
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleRestore}
-                disabled={isRestoring}
-                className="hidden"
-                id="restore-file"
-              />
-              <Button
-                onClick={() => document.getElementById("restore-file")?.click()}
-                disabled={isRestoring}
-                variant="outline"
-                className="w-full md:w-auto"
-              >
-                {isRestoring ? "⏳ Restoring..." : "📤 Upload Backup File"}
-              </Button>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Replace Mode: Deletes old data first</p>
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleRestore}
+                  disabled={isRestoring}
+                  className="hidden"
+                  id="restore-file"
+                />
+                <Button
+                  onClick={() => document.getElementById("restore-file")?.click()}
+                  disabled={isRestoring}
+                  variant="outline"
+                  className="w-full md:w-auto"
+                >
+                  {isRestoring ? "⏳ Restoring..." : "📤 Replace & Restore"}
+                </Button>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Merge Mode: Only adds new records</p>
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleIncrementalRestore}
+                  disabled={isRestoring}
+                  className="hidden"
+                  id="incremental-restore-file"
+                />
+                <Button
+                  onClick={() => document.getElementById("incremental-restore-file")?.click()}
+                  disabled={isRestoring}
+                  variant="secondary"
+                  className="w-full md:w-auto"
+                >
+                  {isRestoring ? "⏳ Restoring..." : "📥 Merge & Add New"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
